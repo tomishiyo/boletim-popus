@@ -10,7 +10,7 @@ O Boletim Popus é um abaixo-assinado permanente contra a política de juros do 
 
 É um contraponto ao [Boletim Focus](https://www.bcb.gov.br/publicacoes/focus): o Focus reúne as projeções dos economistas do mercado; o Popus reúne a voz de quem toma crédito.
 
-> **Status:** protótipo. A landing page e a minuta da política de privacidade estão prontas, sem backend. O primeiro relatório oficial está previsto para a reunião do COPOM de 16–17 de março de 2027.
+> **Status:** protótipo. A landing page e a minuta da política de privacidade estão prontas, sem backend. O MVP vai coletar assinaturas e relatos desde o início. O primeiro relatório oficial está previsto para a reunião do COPOM de 16–17 de março de 2027.
 
 ## A ideia
 
@@ -30,9 +30,12 @@ A landing page é uma sequência de cartazes no estilo lambe-lambe, um por tema,
 
 | Passo | O que acontece |
 |---|---|
-| 1. Você assina | Com nome, e-mail e CPF. O CPF garante uma assinatura por pessoa e nunca é publicado. |
-| 2. Você confirma pelo e-mail | Sem o clique no link de confirmação, a assinatura não conta. |
-| 3. Sua assinatura vai no relatório | A assinatura vale para todos os ciclos até ser retirada. O nome só aparece se a pessoa autorizar; caso contrário, ela entra apenas na contagem. |
+| 1. Você assina | Com nome, e-mail e CPF; UF e município são opcionais. Leva menos de 1 minuto. O CPF garante uma assinatura por pessoa e nunca é publicado. |
+| 2. Você conta sua história (opcional) | Logo depois de assinar, você pode responder um questionário curto sobre como os juros afetaram sua vida, sua família ou sua empresa. |
+| 3. Você confirma pelo e-mail | Sem o clique no link de confirmação, nem a assinatura nem o relato contam. |
+| 4. Sua assinatura vai no relatório | A assinatura vale para todos os ciclos até ser retirada. O nome só aparece se a pessoa autorizar; caso contrário, ela entra apenas na contagem. O relato entra só como número agregado. |
+
+Só quem assina pode fazer o relato: assim, cada número do relatório se apoia em uma assinatura com CPF único e e-mail confirmado.
 
 ## O relatório
 
@@ -45,6 +48,8 @@ Cada reunião do COPOM gera um relatório, congelado 8 dias antes da reunião. E
 </p>
 
 Os números são **relatos dos signatários**, de uma amostra autosselecionada, e nunca são apresentados como estatística do país. O relatório diz o que a validação garante (uma assinatura por CPF com formato válido e e-mail confirmado) e nunca afirma que o CPF foi verificado na Receita Federal.
+
+As métricas publicadas ainda estão sendo definidas; o questionário do relato será derivado delas, de modo que cada pergunta corresponda a um número do relatório.
 
 ### Ciclo
 
@@ -59,8 +64,10 @@ Os números são **relatos dos signatários**, de uma amostra autosselecionada, 
 
 Assinar um abaixo-assinado revela uma opinião política, que a LGPD trata como dado sensível. Por isso, a base inteira é tratada como sensível:
 
-- consentimentos em caixas separadas e não marcadas, com registro de data, versão do termo e IP;
+- consentimentos em caixas separadas e não marcadas, com registro de data, versão do termo e IP; o relato tem consentimento próprio;
 - CPF guardado só como HMAC, com a chave fora do banco; nunca publicado nem enviado a terceiros;
+- assinaturas e relatos não confirmados por e-mail são apagados após 7 dias;
+- relatos publicados só como números agregados;
 - gestão da assinatura sem senha, por link mágico de uso único, com retirada a qualquer momento;
 - sem ferramentas de análise de audiência, pixels, publicidade ou rastreamento de e-mails;
 - fontes servidas pelo próprio site, sem Google Fonts.
@@ -92,8 +99,8 @@ Para ver o protótipo, basta abrir `index.html` no navegador. Links para página
 
 | Fase | Período | Entregas |
 |---|---|---|
-| 0. Protótipo e fundamentos | nov–dez 2026 | Landing page, especificação, metodologia, política de privacidade, revisão jurídica |
-| 1. MVP de assinatura | dez 2026–jan 2027 | Formulário com confirmação por e-mail, página Meus Dados, painel administrativo |
-| 2. Relatos e relatório | jan–fev 2027 | Formulário de relato, geração do PDF, ciclo de teste na reunião de 26–27 de janeiro |
+| 0. Protótipo e fundamentos | nov–dez 2026 | Landing page, especificação, métricas do relatório e questionário do relato, metodologia, política de privacidade, revisão jurídica |
+| 1. MVP de assinatura e relato | dez 2026–jan 2027 | Formulário de assinatura com confirmação por e-mail, formulário de relato, página Meus Dados, painel administrativo |
+| 2. Relatório | jan–fev 2027 | Geração do PDF, ciclo de teste na reunião de 26–27 de janeiro, já com relatos reais |
 | 3. Conteúdo e divulgação | fev–mar 2027 | Biblioteca, Compartilhe, artigos "Entenda" |
 | Primeiro relatório | mar 2027 | Entrega antes da reunião de 16–17 de março |
