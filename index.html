@@ -250,8 +250,12 @@ a { color: inherit; }
   counter-reset: passo;
   max-width: 64rem;
 }
+/* Quatro passos: 2 × 2 em telas médias, uma linha só em telas largas */
 @media (min-width: 52rem) {
-  .passos { grid-template-columns: repeat(3, 1fr); gap: 2.5rem; }
+  .passos { grid-template-columns: repeat(2, 1fr); gap: 2.5rem; }
+}
+@media (min-width: 80rem) {
+  .passos { grid-template-columns: repeat(4, 1fr); max-width: 80rem; }
 }
 .passos li {
   counter-increment: passo;
@@ -271,6 +275,10 @@ a { color: inherit; }
   margin: 0 0 0.4rem;
   font-size: 1.3rem;
   line-height: 1.25;
+}
+.passos .opcional {
+  font-weight: 400;
+  font-size: 1rem;
 }
 .passos p { margin: 0; }
 
@@ -614,15 +622,19 @@ a { color: inherit; }
     <ol class="passos">
       <li>
         <h3>Você assina</h3>
-        <p>Com seu nome, e-mail e CPF. O CPF garante uma assinatura por pessoa e nunca é publicado. Leva menos de um minuto.</p>
+        <p>Com seu nome, e-mail e CPF; estado e cidade são opcionais. O CPF garante uma assinatura por pessoa e nunca é publicado. Leva menos de um minuto.</p>
+      </li>
+      <li>
+        <h3>Você conta sua história <span class="opcional">(opcional)</span></h3>
+        <p>Logo depois de assinar, você pode responder algumas perguntas rápidas sobre como os juros afetaram sua vida, sua família ou sua empresa. Suas respostas entram no relatório só como números, somadas às das outras pessoas.</p>
       </li>
       <li>
         <h3>Você confirma pelo e-mail</h3>
-        <p>Mandamos um link de confirmação. Sem ele, a assinatura não conta.</p>
+        <p>Mandamos um link de confirmação. Sem ele, nem a assinatura nem o seu relato contam.</p>
       </li>
       <li>
-        <h3>Sua assinatura vai no relatório</h3>
-        <p>Antes de cada reunião do COPOM, o relatório com todas as assinaturas é entregue ao Banco Central e ao Ministério da Fazenda, e publicado aqui no site. Seu nome só aparece se você autorizar; se preferir, você entra apenas na contagem.</p>
+        <h3>Sua voz vai no relatório</h3>
+        <p>Antes de cada reunião do COPOM, o relatório é entregue ao Banco Central e ao Ministério da Fazenda, e publicado aqui no site. Seu nome só aparece se você autorizar; se preferir, você entra apenas na contagem.</p>
       </li>
     </ol>
 
@@ -669,7 +681,7 @@ a { color: inherit; }
 
     <ul class="garantias">
       <li>Você pode retirar sua assinatura quando quiser, até o fechamento de cada relatório.</li>
-      <li>Não vendemos nem compartilhamos seus dados. Eles só são usados para o abaixo-assinado.</li>
+      <li>Não vendemos nem compartilhamos seus dados. Eles só são usados para o abaixo-assinado. <a href="privacidade.html">Leia nossa política de privacidade</a>.</li>
       <li><a href="/quem-somos" data-em-breve="A página Quem Somos ainda está em construção.">Conheça quem está por trás do Popus</a>.</li>
     </ul>
   </section>
@@ -694,7 +706,7 @@ a { color: inherit; }
     <ul>
       <li><a href="/quem-somos" data-em-breve="A página Quem Somos ainda está em construção.">Quem somos</a></li>
       <li><a href="/biblioteca" data-em-breve="A Biblioteca ainda está em construção.">Biblioteca</a></li>
-      <li><a href="/privacidade" data-em-breve="A Política de Privacidade ainda está em construção.">Política de privacidade</a></li>
+      <li><a href="privacidade.html">Política de privacidade</a></li>
       <li><a href="/meus-dados" data-em-breve="A página Meus Dados ainda está em construção.">Meus dados e retirada de assinatura</a></li>
       <li><a href="mailto:contato@exemplo.org">Contato</a></li>
     </ul>
