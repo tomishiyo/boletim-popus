@@ -265,7 +265,7 @@ tbody th { font-weight: 700; background: #f3f3f3; }
 <header class="topo">
   <a class="marca-pequena" href="/">Boletim<span>Popus</span></a>
   <h1>Política de privacidade</h1>
-  <p class="versao">Versão 0.1 · 11 de novembro de 2026</p>
+  <p class="versao">Versão 0.2 · 12 de novembro de 2026</p>
   <!-- MINUTA: remover este aviso e as marcas [PENDENTE] depois da revisão jurídica. -->
   <p class="minuta">Minuta em revisão jurídica. Este texto ainda não está em vigor e pode mudar antes do lançamento.</p>
 </header>
@@ -275,9 +275,10 @@ tbody th { font-weight: 700; background: #f3f3f3; }
   <section class="resumo" aria-labelledby="t-resumo">
     <h2 id="t-resumo">Em poucas palavras</h2>
     <ul>
-      <li>Para assinar, pedimos <strong>nome, e-mail e CPF</strong>. UF e município são opcionais.</li>
+      <li>Para assinar, pedimos <strong>nome, e-mail e CPF</strong>. O estado (UF) é opcional.</li>
       <li>Assinar um abaixo-assinado revela uma opinião política. Por isso, <strong>tratamos todos os seus dados como dados sensíveis</strong> e só usamos com o seu consentimento.</li>
       <li><strong>Seu CPF nunca é publicado nem enviado a ninguém.</strong> Ele serve só para garantir uma assinatura por pessoa e é guardado de forma embaralhada.</li>
+      <li>Depois de assinar, você pode <strong>contar como os juros afetaram sua vida</strong>, num questionário opcional, com um consentimento próprio. As respostas só entram no relatório como números somados, nunca individualmente.</li>
       <li><strong>Seu nome só aparece no relatório e no site se você autorizar.</strong> Se autorizar, ele pode aparecer em buscadores como o Google.</li>
       <li>O relatório é entregue ao Banco Central e ao Ministério da Fazenda e publicado no site antes de cada reunião do COPOM.</li>
       <li><strong>Não vendemos seus dados</strong>, não usamos publicidade e não rastreamos se você abre nossos e-mails.</li>
@@ -333,11 +334,28 @@ tbody th { font-weight: 700; background: #f3f3f3; }
         <tr><th scope="row">Nome completo</th><td>Sim</td><td>Publicado só se você autorizar.</td></tr>
         <tr><th scope="row">E-mail</th><td>Sim</td><td>Usado para confirmar a assinatura e para você gerenciá-la.</td></tr>
         <tr><th scope="row">CPF</th><td>Sim</td><td>Nunca publicado nem enviado. Veja a <a href="#cpf">seção 5</a>.</td></tr>
-        <tr><th scope="row">UF e município</th><td>Não</td><td>Usados só em números regionais agregados.</td></tr>
+        <tr><th scope="row">Estado (UF)</th><td>Não</td><td>Usado só para contar quantas assinaturas há em cada estado.</td></tr>
         <tr><th scope="row">Suas escolhas</th><td>Sim</td><td>Se autoriza publicar o nome, se quer receber lembretes e a declaração de que tem 18 anos ou mais.</td></tr>
       </tbody>
     </table>
   </div>
+
+  <h3>Dados que você informa no relato (opcional)</h3>
+  <p>Depois de assinar, você pode responder um questionário sobre como os juros afetaram você nos últimos 12 meses. Ele só é aberto com um consentimento próprio, separado do da assinatura, e as perguntas que aparecem dependem das suas respostas. <span class="pendente">[PENDENTE: revisão jurídica das perguntas do relato]</span></p>
+  <div class="tabela">
+    <table>
+      <thead><tr><th scope="col">Tema</th><th scope="col">O que perguntamos</th></tr></thead>
+      <tbody>
+        <tr><th scope="row">Como os juros te afetaram</th><td>Se como pessoa física, como dono, sócio ou administrador de empresa, ou os dois.</td></tr>
+        <tr><th scope="row">Sua empresa</th><td>Se ela fechou, pediu recuperação judicial ou extrajudicial ou renegociou dívidas para não fechar; quantas pessoas trabalhavam nela; se você adiou ou desistiu de um investimento e quantas pessoas contrataria; o CNPJ, se quiser informar.</td></tr>
+        <tr><th scope="row">Crédito fora de banco</th><td>Só se você pegou dinheiro emprestado com juros fora de banco ou financeira (sim ou não). Não perguntamos de quem, quanto nem onde.</td></tr>
+        <tr><th scope="row">Compras</th><td>Se você adiou ou desistiu de comprar um veículo, um imóvel ou de reformar a casa.</td></tr>
+        <tr><th scope="row">Dívidas</th><td>Se tem contas em atraso, se acha que não vai conseguir pagá-las, a faixa da renda que vai para parcelas de dívidas, os tipos de dívida (rotativo, cheque especial, consignado, financiamento) e se teve o nome negativado.</td></tr>
+        <tr><th scope="row">Papel dos juros</th><td>Se os juros foram a causa principal ou um dos fatores.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>O CNPJ, se informado, é guardado só em forma embaralhada (HMAC), como o CPF, e serve apenas para não contar a mesma empresa duas vezes. Não pedimos valores em reais nem a sua renda.</p>
 
   <h3>Dados gerados quando você usa o site</h3>
   <ul>
@@ -352,7 +370,7 @@ tbody th { font-weight: 700; background: #f3f3f3; }
   <p>Se você escrever para o encarregado, guardamos a mensagem e o que for necessário para responder. Se pedirmos alguma informação para confirmar sua identidade, ela é usada só para isso e descartada assim que o pedido for atendido.</p>
 
   <h3>O que não coletamos</h3>
-  <p>Não pedimos telefone, endereço, data de nascimento nem renda. Não usamos ferramentas de análise de audiência, pixels de redes sociais nem publicidade, e não rastreamos aberturas ou cliques nos nossos e-mails.</p>
+  <p>Não pedimos telefone, endereço, município, data de nascimento, renda nem valores em reais. No relato, perguntamos apenas a faixa da renda que vai para parcelas de dívidas. Não usamos ferramentas de análise de audiência, pixels de redes sociais nem publicidade, e não rastreamos aberturas ou cliques nos nossos e-mails.</p>
 
   <!-- 4 -->
   <h2 id="finalidades">4. Para que usamos e com qual base legal</h2>
@@ -371,9 +389,14 @@ tbody th { font-weight: 700; background: #f3f3f3; }
           <td>Consentimento específico, numa caixa própria (art. 11, I)</td>
         </tr>
         <tr>
-          <th scope="row">Mostrar números regionais agregados</th>
-          <td>UF e município, se informados</td>
+          <th scope="row">Mostrar o número de assinaturas por estado</th>
+          <td>UF, se informada</td>
           <td>Consentimento (art. 11, I)</td>
+        </tr>
+        <tr>
+          <th scope="row">Somar os relatos e publicar os números agregados no relatório</th>
+          <td>Respostas do relato, CNPJ (embaralhado)</td>
+          <td>Consentimento específico, numa caixa própria (art. 11, I)</td>
         </tr>
         <tr>
           <th scope="row">Enviar e-mails necessários para a assinatura funcionar</th>
@@ -398,7 +421,7 @@ tbody th { font-weight: 700; background: #f3f3f3; }
       </tbody>
     </table>
   </div>
-  <p>Não usamos seus dados para nenhuma outra finalidade. Em especial, não cedemos a base de assinaturas a partidos, candidatos, empresas ou outras campanhas.</p>
+  <p>Não usamos seus dados para nenhuma outra finalidade. Em especial, não cedemos a base de assinaturas nem os relatos a partidos, candidatos, empresas ou outras campanhas.</p>
 
   <!-- 5 -->
   <h2 id="cpf">5. Como tratamos o seu CPF</h2>
@@ -410,16 +433,17 @@ tbody th { font-weight: 700; background: #f3f3f3; }
   </ol>
   <p>O código permite saber se o mesmo CPF já assinou, mas não permite recuperar o número. Se dois cadastros usarem o mesmo CPF, os dois saem da contagem até uma revisão manual.</p>
   <p><strong>Não consultamos a Receita Federal.</strong> Por isso, o relatório diz apenas que há uma assinatura por CPF com formato válido e e-mail confirmado, nunca que o CPF foi verificado.</p>
-  <p>Seu CPF nunca é publicado, nunca vai no relatório e nunca é enviado a órgãos públicos nem a fornecedores.</p>
+  <p>Seu CPF nunca é publicado, nunca vai no relatório e nunca é enviado a órgãos públicos nem a fornecedores. O mesmo vale para o CNPJ informado no relato.</p>
 
   <!-- 6 -->
   <h2 id="publicacao">6. O que é publicado e entregue</h2>
-  <p>Antes de cada reunião do COPOM, congelamos as assinaturas ativas e geramos um relatório em PDF. O relatório é protocolado na Ouvidoria do Banco Central e na plataforma Fala.BR, enviado ao Ministério da Fazenda e publicado no site.</p>
+  <p>Antes de cada reunião do COPOM, congelamos as assinaturas ativas e os relatos e geramos um relatório em PDF. O relatório é protocolado na Ouvidoria do Banco Central e na plataforma Fala.BR, enviado ao Ministério da Fazenda e publicado no site.</p>
   <h3>O relatório traz</h3>
   <ul>
     <li>o total de assinaturas e as novas assinaturas do ciclo;</li>
-    <li>números regionais <strong>agregados</strong>, calculados só sobre quem informou UF e município. Recortes com poucos signatários não são publicados, para que ninguém seja identificado;</li>
-    <li>um anexo com os <strong>nomes de quem autorizou a publicação</strong>, sem CPF, e-mail, UF ou município. Quem não autorizou entra só na contagem.</li>
+    <li>o número de assinaturas por estado, contado só sobre quem informou a UF;</li>
+    <li>números <strong>agregados</strong> dos relatos, sempre como contagem de signatários (por exemplo, "x signatários relataram o fechamento de suas empresas"). Nenhuma resposta individual é publicada;</li>
+    <li>um anexo com os <strong>nomes de quem autorizou a publicação</strong>, sem CPF, e-mail ou UF. Quem não autorizou entra só na contagem.</li>
   </ul>
   <div class="destaque">
     <p><strong>Se você autorizar a publicação do seu nome:</strong></p>
@@ -460,9 +484,10 @@ tbody th { font-weight: 700; background: #f3f3f3; }
     <table>
       <thead><tr><th scope="col">Situação</th><th scope="col">Por quanto tempo</th></tr></thead>
       <tbody>
-        <tr><th scope="row">Assinatura não confirmada por e-mail</th><td>Apagada após 7 dias</td></tr>
+        <tr><th scope="row">Assinatura não confirmada por e-mail</th><td>Apagada após 7 dias, junto com o relato, se houver</td></tr>
         <tr><th scope="row">Assinatura ativa</th><td>Enquanto você não retirar. A assinatura vale para todos os relatórios seguintes</td></tr>
-        <tr><th scope="row">Assinatura retirada</th><td>Nome, e-mail, CPF embaralhado, UF e município são apagados no congelamento seguinte. Até lá, você pode restaurar a assinatura. Se pedir, apagamos antes</td></tr>
+        <tr><th scope="row">Relato</th><td>Enquanto a assinatura estiver ativa, ou até você retirar o consentimento do relato</td></tr>
+        <tr><th scope="row">Assinatura retirada</th><td>Nome, e-mail, CPF embaralhado, UF e respostas do relato são apagados no congelamento seguinte. Até lá, você pode restaurar a assinatura. Se pedir, apagamos antes</td></tr>
         <tr><th scope="row">Registro mínimo de consentimento e retirada</th><td>Guardado como prova, mesmo depois da retirada, por <span class="pendente">[PENDENTE: prazo]</span></td></tr>
         <tr><th scope="row">Nomes em relatórios já entregues</th><td>Permanecem nesses relatórios, que são documentos históricos</td></tr>
         <tr><th scope="row">Registros de acesso (logs)</th><td>90 dias <span class="pendente">[PENDENTE: confirmar se o Marco Civil exige 6 meses]</span></td></tr>
@@ -488,7 +513,7 @@ tbody th { font-weight: 700; background: #f3f3f3; }
 
   <h3>Como pedir</h3>
   <ul>
-    <li><strong>Na página <a href="/meus-dados" data-em-breve="A página Meus Dados ainda está em construção.">Meus dados</a>:</strong> informe seu e-mail e enviaremos um link de acesso. Lá você vê seus dados, corrige o nome, muda a escolha de publicação, deixa de receber lembretes e retira ou restaura sua assinatura. Para que ninguém descubra quem assinou, a resposta é sempre "se houver cadastro, enviamos um link".</li>
+    <li><strong>Na página <a href="/meus-dados" data-em-breve="A página Meus Dados ainda está em construção.">Meus dados</a>:</strong> informe seu e-mail e enviaremos um link de acesso. Lá você vê seus dados, corrige o nome, muda a escolha de publicação, completa ou atualiza o relato, deixa de receber lembretes e retira ou restaura sua assinatura. Para que ninguém descubra quem assinou, a resposta é sempre "se houver cadastro, enviamos um link".</li>
     <li><strong>Por e-mail ao encarregado</strong> (<a href="mailto:privacidade@exemplo.org">privacidade@exemplo.org</a>): para qualquer outro pedido, ou se você perdeu o acesso ao e-mail cadastrado. Nesse caso, vamos pedir o mínimo necessário para confirmar que você é o titular.</li>
     <li><strong>Em todo e-mail que enviamos</strong> há um link para gerenciar ou retirar sua assinatura.</li>
   </ul>
@@ -496,7 +521,8 @@ tbody th { font-weight: 700; background: #f3f3f3; }
 
   <h3>O que acontece se você retirar o consentimento</h3>
   <ul>
-    <li><strong>Retirar a assinatura:</strong> ela deixa de contar nos próximos relatórios e seus dados são apagados como descrito na <a href="#guarda">seção 9</a>. Até o congelamento, enviamos um e-mail para você restaurar, caso não tenha sido você quem retirou.</li>
+    <li><strong>Retirar a assinatura:</strong> ela deixa de contar nos próximos relatórios, junto com o seu relato, e seus dados são apagados como descrito na <a href="#guarda">seção 9</a>. Até o congelamento, enviamos um e-mail para você restaurar, caso não tenha sido você quem retirou.</li>
+    <li><strong>Retirar o consentimento do relato:</strong> suas respostas são apagadas e deixam de contar nos próximos relatórios. A assinatura continua valendo.</li>
     <li><strong>Desautorizar a publicação do nome:</strong> sua assinatura continua contando, mas seu nome sai dos próximos relatórios.</li>
     <li><strong>Deixar de receber lembretes:</strong> sua assinatura continua ativa. Você segue recebendo só os e-mails necessários (<a href="#emails">seção 11</a>).</li>
   </ul>
@@ -513,6 +539,7 @@ tbody th { font-weight: 700; background: #f3f3f3; }
     <li>links de acesso a Meus dados, quando você pedir;</li>
     <li>aviso de retirada, com a opção de restaurar caso não tenha sido você;</li>
     <li>um aviso por ano de que sua assinatura continua ativa, com o link para gerenciá-la;</li>
+    <li>pedido de confirmação, se uma resposta do relato estiver muito fora do comum (por exemplo, uma empresa com mais de 100 funcionários). Sem a sua confirmação, essa resposta não entra na soma;</li>
     <li>avisos de mudanças importantes nesta política.</li>
   </ul>
   <h3>Só para quem marcou a caixa de lembretes</h3>
@@ -536,7 +563,7 @@ tbody th { font-weight: 700; background: #f3f3f3; }
   <h2 id="seguranca">13. Segurança</h2>
   <ul>
     <li>Todo o tráfego do site é criptografado (HTTPS).</li>
-    <li>O CPF é guardado só como código embaralhado, com chave secreta mantida fora do banco e das cópias de segurança.</li>
+    <li>O CPF e o CNPJ são guardados só como código embaralhado, com chave secreta mantida fora do banco e das cópias de segurança.</li>
     <li>Links de acesso são de uso único, expiram rápido e são guardados de forma embaralhada.</li>
     <li>As cópias de segurança são criptografadas.</li>
     <li>O acesso ao banco de dados é restrito ao responsável pelo projeto.</li>
@@ -550,7 +577,7 @@ tbody th { font-weight: 700; background: #f3f3f3; }
 
   <!-- 15 -->
   <h2 id="mudancas">15. Mudanças nesta política</h2>
-  <p>Cada versão desta política tem número e data, e guardamos em qual versão você deu cada consentimento. Se mudarmos algo importante, avisaremos por e-mail antes de a mudança valer. Se quisermos usar seus dados para uma finalidade nova, como um formulário de relato sobre o impacto dos juros na sua vida, vamos pedir um consentimento novo e separado.</p>
+  <p>Cada versão desta política tem número e data, e guardamos em qual versão você deu cada consentimento. Se mudarmos algo importante, avisaremos por e-mail antes de a mudança valer. Se quisermos usar seus dados para uma finalidade nova, vamos pedir um consentimento novo e separado.</p>
 
   <h2 id="contato">Contato</h2>
   <p>Dúvidas sobre esta política ou sobre seus dados: <a href="mailto:privacidade@exemplo.org">privacidade@exemplo.org</a>.</p>

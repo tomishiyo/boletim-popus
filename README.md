@@ -10,7 +10,7 @@ O Boletim Popus é um abaixo-assinado permanente contra a política de juros do 
 
 É um contraponto ao [Boletim Focus](https://www.bcb.gov.br/publicacoes/focus): o Focus reúne as projeções dos economistas do mercado; o Popus reúne a voz de quem toma crédito.
 
-> **Status:** protótipo. A landing page e a minuta da política de privacidade estão prontas, sem backend. O MVP vai coletar assinaturas e relatos desde o início. O primeiro relatório oficial está previsto para a reunião do COPOM de 16–17 de março de 2027.
+> **Status:** protótipo. A landing page e a minuta da política de privacidade estão prontas, sem backend. As métricas do relatório e as perguntas do relato estão definidas. O MVP vai coletar assinaturas e relatos desde o início. O primeiro relatório oficial está previsto para a reunião do COPOM de 16–17 de março de 2027.
 
 ## A ideia
 
@@ -30,8 +30,8 @@ A landing page é uma sequência de cartazes no estilo lambe-lambe, um por tema,
 
 | Passo | O que acontece |
 |---|---|
-| 1. Você assina | Com nome, e-mail e CPF; UF e município são opcionais. Leva menos de 1 minuto. O CPF garante uma assinatura por pessoa e nunca é publicado. |
-| 2. Você conta sua história (opcional) | Logo depois de assinar, você pode responder um questionário curto sobre como os juros afetaram sua vida, sua família ou sua empresa. |
+| 1. Você assina | Com nome, e-mail e CPF; o estado (UF) é opcional. Leva menos de 1 minuto. O CPF garante uma assinatura por pessoa e nunca é publicado. |
+| 2. Você conta sua história (opcional) | Logo depois de assinar, você pode responder um questionário curto sobre como os juros afetaram sua vida, sua família ou sua empresa nos últimos 12 meses. |
 | 3. Você confirma pelo e-mail | Sem o clique no link de confirmação, nem a assinatura nem o relato contam. |
 | 4. Sua assinatura vai no relatório | A assinatura vale para todos os ciclos até ser retirada. O nome só aparece se a pessoa autorizar; caso contrário, ela entra apenas na contagem. O relato entra só como número agregado. |
 
@@ -39,17 +39,24 @@ Só quem assina pode fazer o relato: assim, cada número do relatório se apoia 
 
 ## O relatório
 
-Cada reunião do COPOM gera um relatório, congelado 8 dias antes da reunião. Ele traz o total de assinaturas (com as novas do ciclo em destaque), números agregados dos relatos sobre o impacto dos juros, contexto com dados oficiais, a metodologia e um anexo só com os nomes de quem autorizou a publicação.
+Cada reunião do COPOM gera um relatório, congelado 8 dias antes da reunião. Ele traz o total de assinaturas (com as novas do ciclo em destaque) e o número de assinaturas por estado, números agregados dos relatos sobre o impacto dos juros, contexto com dados oficiais, a metodologia e um anexo só com os nomes de quem autorizou a publicação.
 
 <p align="center">
-  <img src="docs/img/relatorio-exemplo.png" alt="Modelo do relatório com números fictícios e carimbo de Exemplo: 12.480 assinaturas, empresas que deixaram de expandir, empresas que fecharam, empregos não criados, famílias endividadas e o anexo de nomes" width="420">
+  <img src="docs/img/relatorio-exemplo.png" alt="Modelo do relatório com números fictícios e carimbo de Exemplo: 12.480 assinaturas, signatários que adiaram investimentos, signatários que relataram o fechamento de suas empresas, empregos que teriam sido criados, signatários com contas em atraso e o anexo de nomes" width="420">
   <br>
   <sub>Modelo com números fictícios, como aparece na landing page.</sub>
 </p>
 
-Os números são **relatos dos signatários**, de uma amostra autosselecionada, e nunca são apresentados como estatística do país. O relatório diz o que a validação garante (uma assinatura por CPF com formato válido e e-mail confirmado) e nunca afirma que o CPF foi verificado na Receita Federal.
+Os números são **relatos dos signatários**, de uma amostra autosselecionada, e nunca são apresentados como estatística do país. O sujeito das frases é sempre o signatário ("x signatários relataram o fechamento de suas empresas"). O relatório diz o que a validação garante (uma assinatura por CPF com formato válido e e-mail confirmado) e nunca afirma que o CPF foi verificado na Receita Federal.
 
-As métricas publicadas ainda estão sendo definidas; o questionário do relato será derivado delas, de modo que cada pergunta corresponda a um número do relatório.
+### Métricas
+
+Cada pergunta do relato existe para produzir um número publicado:
+
+- **Eventos**, em duas visões ("desde a primeira edição" e "desde a última reunião do COPOM"): empresas fechadas, em recuperação ou que renegociaram dívidas para não fechar, e os postos de trabalho nelas; investimentos adiados ou cancelados e os empregos que teriam sido criados; compras adiadas de veículo, imóvel ou reforma; crédito tomado fora de banco; nome negativado.
+- **Situação**, como retrato dos últimos 12 meses: contas em atraso, sem condições de pagar, parte da renda que vai para parcelas de dívidas (em faixas compatíveis com a PEIC/CNC) e tipos de dívida.
+
+O relato não pede valores em reais nem a renda. O questionário completo será publicado na metodologia.
 
 ### Ciclo
 
@@ -65,21 +72,22 @@ As métricas publicadas ainda estão sendo definidas; o questionário do relato 
 Assinar um abaixo-assinado revela uma opinião política, que a LGPD trata como dado sensível. Por isso, a base inteira é tratada como sensível:
 
 - consentimentos em caixas separadas e não marcadas, com registro de data, versão do termo e IP; o relato tem consentimento próprio;
-- CPF guardado só como HMAC, com a chave fora do banco; nunca publicado nem enviado a terceiros;
-- assinaturas e relatos não confirmados por e-mail são apagados após 7 dias;
+- CPF guardado só como HMAC, com a chave fora do banco; nunca publicado nem enviado a terceiros. O CNPJ, opcional no relato, recebe o mesmo tratamento;
+- só a UF é pedida, sem município, telefone, endereço ou renda;
+- assinaturas e relatos não confirmados por e-mail são apagados após 7 dias; retirar a assinatura apaga também o relato;
 - relatos publicados só como números agregados;
 - gestão da assinatura sem senha, por link mágico de uso único, com retirada a qualquer momento;
 - sem ferramentas de análise de audiência, pixels, publicidade ou rastreamento de e-mails;
 - fontes servidas pelo próprio site, sem Google Fonts.
 
-A minuta da política está em [`privacidade.html`](privacidade.html) (versão 0.1, em revisão jurídica, ainda não em vigor).
+A minuta da política está em [`privacidade.html`](privacidade.html) (versão 0.2, em revisão jurídica, ainda não em vigor).
 
 ## Estrutura do repositório
 
 ```
 .
 ├── index.html          # Landing page (protótipo: HTML, CSS e JS num arquivo só)
-├── privacidade.html    # Minuta da política de privacidade (v0.1)
+├── privacidade.html    # Minuta da política de privacidade (v0.2)
 └── docs/
     └── img/            # Imagens deste README
 ```
@@ -88,7 +96,7 @@ Para ver o protótipo, basta abrir `index.html` no navegador. Links para página
 
 ## Stack planejada
 
-- **Backend:** Django + PostgreSQL, com o painel administrativo para moderar relatos e acionar os ciclos.
+- **Backend:** Django + PostgreSQL, com o painel administrativo para revisar relatos fora do comum e acionar os ciclos.
 - **Frontend:** templates do Django com um pouco de HTMX, reaproveitando o HTML e o CSS da landing.
 - **PDF:** WeasyPrint ou Typst, gráficos com matplotlib.
 - **E-mail:** Brevo, com rastreamento de aberturas e cliques desligado.
