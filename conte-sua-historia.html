@@ -1,0 +1,1057 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Conte sua história · Boletim Popus</title>
+<meta name="description" content="Conte como os juros afetaram você nos últimos 12 meses. Suas respostas entram no relatório só como números agregados.">
+<meta name="robots" content="noindex">
+<style>
+/* ============================================================
+   Boletim Popus — relato (/conte-sua-historia)
+   Protótipo de front-end: as respostas ficam só na memória da
+   página. Pontos de integração com o backend marcados com "BACKEND:".
+
+   Uma tela por bloco (decidido em 13/11/2026); cada tela é um
+   cartaz de uma cor, como as dobras da landing.
+   ============================================================ */
+@font-face { font-family: "Big Shoulders Display"; src: url("/fontes/big-shoulders-display-700.woff2") format("woff2"); font-weight: 700; font-display: swap; }
+@font-face { font-family: "Big Shoulders Display"; src: url("/fontes/big-shoulders-display-900.woff2") format("woff2"); font-weight: 900; font-display: swap; }
+@font-face { font-family: "Atkinson Hyperlegible"; src: url("/fontes/atkinson-hyperlegible-400.woff2") format("woff2"); font-weight: 400; font-display: swap; }
+@font-face { font-family: "Atkinson Hyperlegible"; src: url("/fontes/atkinson-hyperlegible-700.woff2") format("woff2"); font-weight: 700; font-display: swap; }
+
+:root {
+  --tinta: #000000;
+  --branco: #ffffff;
+  --papel-amarelo: #ffe600;
+  --papel-ciano:   #3fc8f2;
+  --papel-rosa:    #ff74a8;
+  --papel-laranja: #ff8f2e;
+  --papel-lima:    #bfe34f;
+  --papel-lilas:   #bda9ff;
+  --erro: #c4004a;
+
+  --fonte-cartaz: "Big Shoulders Display", "Arial Narrow", sans-serif;
+  --fonte-texto: "Atkinson Hyperlegible", system-ui, sans-serif;
+
+  --gutter: clamp(1rem, 5vw, 4rem);
+  --folha-max: 42rem;
+  --papel: var(--papel-amarelo);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+body {
+  margin: 0;
+  background: var(--papel);
+  color: var(--tinta);
+  font-family: var(--fonte-texto);
+  font-size: 1.125rem;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 200ms ease;
+}
+@media (prefers-reduced-motion: reduce) { body { transition: none; } }
+
+/* Cor do papel conforme a etapa */
+body[data-papel="amarelo"] { --papel: var(--papel-amarelo); }
+body[data-papel="ciano"]   { --papel: var(--papel-ciano); }
+body[data-papel="rosa"]    { --papel: var(--papel-rosa); }
+body[data-papel="laranja"] { --papel: var(--papel-laranja); }
+body[data-papel="lima"]    { --papel: var(--papel-lima); }
+body[data-papel="lilas"]   { --papel: var(--papel-lilas); }
+
+a { color: inherit; text-underline-offset: 3px; }
+:focus-visible { outline: 4px solid var(--tinta); outline-offset: 4px; }
+[hidden] { display: none !important; }
+
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* ---------- Topo ---------- */
+.topo { padding: clamp(1.25rem, 4vh, 2rem) var(--gutter) 0; }
+.marca-pequena {
+  display: inline-block;
+  font-family: var(--fonte-cartaz);
+  font-weight: 900;
+  font-size: 1.6rem;
+  line-height: 1;
+  text-transform: uppercase;
+  text-decoration: none;
+}
+.marca-pequena span {
+  background: var(--tinta);
+  color: var(--papel);
+  padding: 0 0.12em;
+  margin-left: 0.15em;
+  display: inline-block;
+  transform: rotate(-2deg);
+}
+
+main { padding: clamp(1.5rem, 5vh, 3rem) var(--gutter) 4rem; min-height: 70vh; }
+
+/* ---------- Progresso ---------- */
+.progresso {
+  max-width: var(--folha-max);
+  margin: 0 0 1.25rem;
+}
+.progresso-texto {
+  margin: 0 0 0.5rem;
+  font-family: var(--fonte-cartaz);
+  font-weight: 900;
+  font-size: 1.35rem;
+  line-height: 1;
+  text-transform: uppercase;
+}
+.progresso-barra {
+  display: flex;
+  gap: 6px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.progresso-barra li {
+  flex: 1;
+  height: 10px;
+  border: 3px solid var(--tinta);
+  background: transparent;
+}
+.progresso-barra li.feito { background: var(--tinta); }
+
+/* ---------- Títulos ---------- */
+h1, .etapa h2.titulo-etapa {
+  margin: 0 0 1rem;
+  font-family: var(--fonte-cartaz);
+  font-weight: 900;
+  line-height: 0.95;
+}
+h1 { font-size: clamp(2.6rem, 9vw, 5rem); max-width: 14ch; }
+.etapa h2.titulo-etapa { font-size: clamp(2.2rem, 7vw, 3.6rem); max-width: 16ch; }
+
+.intro {
+  max-width: var(--folha-max);
+  margin: 0 0 1.75rem;
+  font-size: clamp(1.1rem, 3vw, 1.25rem);
+}
+.intro p { margin: 0 0 0.9rem; }
+.intro p:first-child { font-weight: 700; }
+
+/* ---------- Folha com as perguntas ---------- */
+.folha {
+  max-width: var(--folha-max);
+  background: var(--branco);
+  border: 4px solid var(--tinta);
+  box-shadow: 10px 10px 0 var(--tinta);
+  padding: clamp(1.25rem, 4vw, 2.25rem);
+}
+
+.pergunta {
+  border: 0;
+  margin: 0 0 2rem;
+  padding: 0;
+  min-width: 0;
+}
+.pergunta + .pergunta {
+  border-top: 3px solid var(--tinta);
+  padding-top: 1.5rem;
+}
+.pergunta legend,
+.pergunta > label:not(.opcao) {
+  display: block;
+  padding: 0;
+  margin: 0 0 0.9rem;
+  font-weight: 700;
+  font-size: 1.15rem;
+  line-height: 1.4;
+}
+/* Por padrão, a legenda do fieldset fica em cima da borda superior e a
+   interrompe. Com float, ela vira um bloco comum dentro da pergunta. */
+.pergunta legend { float: left; width: 100%; }
+.pergunta legend + * { clear: both; }
+.pergunta .apoio {
+  margin: -0.4rem 0 0.9rem;
+  font-size: 0.98rem;
+}
+.pergunta .instrucao {
+  display: block;
+  font-weight: 400;
+  font-size: 0.95rem;
+  margin-top: 0.25rem;
+}
+
+/* Opções (rádio e caixa) */
+.opcao {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0 0.8rem;
+  align-items: start;
+  padding: 0.7rem 0.8rem;
+  margin: 0 0 0.5rem;
+  border: 3px solid var(--tinta);
+  cursor: pointer;
+}
+.opcao:hover { background: #f3f3f3; }
+.opcao:has(input:checked) { background: var(--papel); }
+.opcao input {
+  width: 1.5rem;
+  height: 1.5rem;
+  margin: 0.05rem 0 0;
+  accent-color: var(--tinta);
+  cursor: pointer;
+}
+.opcao .texto-opcao { font-weight: 700; }
+.opcao .exemplo {
+  grid-column: 2;
+  font-size: 0.95rem;
+  font-weight: 400;
+}
+.opcoes-lado { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 0.6rem; }
+
+input[type="text"] {
+  font: inherit;
+  color: var(--tinta);
+  background: var(--branco);
+  border: 3px solid var(--tinta);
+  border-radius: 0;
+  padding: 0.7rem 0.8rem;
+  min-height: 3.2rem;
+  width: 100%;
+}
+input.numero { max-width: 10rem; }
+input:focus-visible { outline: 4px solid var(--papel-ciano); outline-offset: 0; }
+[aria-invalid="true"] { border-color: var(--erro) !important; }
+
+.erro {
+  margin: 0.5rem 0 0;
+  color: var(--erro);
+  font-weight: 700;
+  font-size: 0.98rem;
+}
+.erro a { color: inherit; }
+
+/* Bloco do CNPJ, que aparece dentro da P1 */
+.bloco-cnpj {
+  margin: 0.25rem 0 0.5rem;
+  padding: 1rem;
+  border: 3px dashed var(--tinta);
+}
+.bloco-cnpj label { display: block; font-weight: 700; margin-bottom: 0.4rem; }
+.bloco-cnpj .apoio { margin: 0 0 0.8rem; font-size: 0.95rem; }
+.cnpj-linha { display: flex; gap: 0.5rem; margin-bottom: 0.5rem; }
+.cnpj-linha input { flex: 1; }
+.cnpj-item + .cnpj-item { margin-top: 0.5rem; }
+
+/* Pergunta que aparece conforme a resposta anterior */
+.dependente {
+  margin-left: 0.25rem;
+  padding-left: 1rem;
+  border-left: 6px solid var(--papel);
+}
+
+/* Caixa de consentimento (entrada) */
+.caixa {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0 0.8rem;
+  align-items: start;
+  margin: 0 0 1.5rem;
+}
+.caixa input {
+  width: 1.6rem;
+  height: 1.6rem;
+  margin: 0.05rem 0 0;
+  accent-color: var(--tinta);
+}
+.caixa label { font-weight: 700; }
+.caixa .erro { grid-column: 2; }
+
+/* ---------- Botões ---------- */
+.acoes {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem 1.5rem;
+  margin-top: 1.5rem;
+}
+.botao {
+  display: inline-block;
+  background: var(--tinta);
+  color: var(--papel);
+  font-family: var(--fonte-cartaz);
+  font-weight: 900;
+  font-size: clamp(1.4rem, 4.5vw, 1.8rem);
+  line-height: 1.1;
+  text-align: center;
+  text-decoration: none;
+  padding: 0.75rem 1.5rem 0.85rem;
+  border: 4px solid var(--tinta);
+  box-shadow: 6px 6px 0 var(--papel), 6px 6px 0 3px var(--tinta);
+  cursor: pointer;
+  transition: transform 120ms ease;
+}
+.botao:hover { transform: translate(-2px, -2px); }
+.botao:active { transform: translate(3px, 3px); }
+@media (prefers-reduced-motion: reduce) { .botao { transition: none; } }
+
+.botao-texto {
+  background: none;
+  border: 0;
+  padding: 0.3rem 0;
+  font: inherit;
+  font-weight: 700;
+  color: var(--tinta);
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+  cursor: pointer;
+}
+.botao-texto:hover { text-decoration-thickness: 4px; }
+.botao-pequeno {
+  background: var(--branco);
+  border: 3px solid var(--tinta);
+  font: inherit;
+  font-weight: 700;
+  font-size: 0.95rem;
+  padding: 0.4rem 0.8rem;
+  cursor: pointer;
+}
+.acoes .empurra { margin-left: auto; }
+@media (max-width: 30rem) {
+  .acoes { flex-direction: column; align-items: stretch; }
+  .acoes .empurra { margin-left: 0; order: 3; text-align: center; }
+  .acoes .botao { order: 1; }
+  .acoes .voltar { order: 2; text-align: center; }
+}
+
+/* ---------- Encerramento ---------- */
+.fim .folha p { margin: 0 0 1rem; }
+.fim .folha > p:last-child { margin-bottom: 0; }
+.compartilhar {
+  max-width: var(--folha-max);
+  margin-top: 3rem;
+  border-top: 6px solid var(--tinta);
+  padding-top: 1.25rem;
+}
+.compartilhar h2 {
+  margin: 0 0 0.75rem;
+  font-family: var(--fonte-cartaz);
+  font-weight: 900;
+  font-size: clamp(1.9rem, 6vw, 2.8rem);
+  line-height: 1;
+}
+.compartilhar p { margin: 0 0 1.5rem; }
+.botao-whatsapp { display: inline-flex; align-items: center; gap: 0.6rem; }
+.botao-whatsapp svg { width: 1.6rem; height: 1.6rem; flex: none; }
+
+/* ---------- Rodapé ---------- */
+.rodape {
+  background: var(--tinta);
+  color: var(--branco);
+  padding: 2.5rem var(--gutter) 3rem;
+  font-size: 1rem;
+}
+.rodape nav ul {
+  list-style: none;
+  margin: 0 0 1.5rem;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 2rem;
+}
+.rodape p { margin: 0; max-width: 40rem; opacity: 0.85; }
+.rodape :focus-visible { outline-color: var(--papel-amarelo); }
+
+/* ---------- Aviso "em construção" (só no protótipo) ---------- */
+.aviso {
+  position: fixed;
+  left: 50%;
+  bottom: 1.25rem;
+  transform: translate(-50%, 150%);
+  background: var(--tinta);
+  color: var(--branco);
+  padding: 0.85rem 1.25rem;
+  font-weight: 700;
+  width: max-content;
+  max-width: calc(100vw - 2rem);
+  box-shadow: 5px 5px 0 var(--papel-amarelo);
+  visibility: hidden;
+  transition: transform 200ms ease, visibility 0s linear 200ms;
+  z-index: 10;
+}
+.aviso.visivel { transform: translate(-50%, 0); visibility: visible; transition: transform 200ms ease; }
+@media (prefers-reduced-motion: reduce) { .aviso { transition: none; } }
+</style>
+</head>
+<body data-papel="amarelo">
+
+<header class="topo">
+  <a class="marca-pequena" href="/">Boletim<span>Popus</span></a>
+</header>
+
+<!-- BACKEND: cada "Continuar" envia o bloco ao servidor (HTMX, hx-post),
+     que grava as respostas ligadas à assinatura da sessão. Antes da
+     confirmação do e-mail, o relato fica pendente e é apagado com a
+     assinatura não confirmada após 7 dias. -->
+<main>
+
+  <!-- ============ ENTRADA ============ -->
+  <section class="etapa" data-etapa="entrada" data-papel="amarelo" aria-labelledby="t-entrada">
+    <h1 id="t-entrada" tabindex="-1">Conte sua história</h1>
+
+    <!-- Texto decidido em 13/11/2026 -->
+    <div class="intro">
+      <p>Tem mais 5 minutos? Então conte como os juros te afetaram nos últimos 12 meses.</p>
+      <p>Sua assinatura já foi enviada; falta só confirmar pelo e-mail. As perguntas abaixo são totalmente opcionais e ajudam a enriquecer o relatório, fortalecendo nossa posição.</p>
+      <p>Suas respostas só entram no relatório somadas às de outras pessoas, nunca individualmente.</p>
+    </div>
+
+    <form class="folha" data-form="entrada" novalidate>
+      <!-- RASCUNHO: texto da caixa a revisar com o advogado. Consentimento próprio, separado do da assinatura. -->
+      <div class="caixa">
+        <input type="checkbox" id="consentimento-relato" name="consentimento_relato" value="1" aria-describedby="erro-consentimento-relato">
+        <label for="consentimento-relato">Autorizo o uso das minhas respostas para compor os números agregados do relatório, conforme a <a href="privacidade.html#dados">política de privacidade</a>.</label>
+        <p class="erro" id="erro-consentimento-relato" hidden></p>
+      </div>
+      <div class="acoes">
+        <button type="submit" class="botao">Começar</button>
+      </div>
+    </form>
+  </section>
+
+  <!-- ============ ABERTURA (P1) ============ -->
+  <section class="etapa" data-etapa="abertura" data-papel="ciano" aria-labelledby="t-abertura" hidden>
+    <div class="progresso"></div>
+    <h2 class="titulo-etapa" id="t-abertura" tabindex="-1">Como os juros te afetaram</h2>
+
+    <form class="folha" data-form="abertura" novalidate>
+      <fieldset class="pergunta" data-tipo="multipla" data-q="p1">
+        <legend>Nos últimos 12 meses, os juros, o crédito caro ou as dívidas afetaram você:
+          <span class="instrucao">Pode marcar as duas.</span>
+        </legend>
+
+        <label class="opcao">
+          <input type="checkbox" name="perfil" value="pf">
+          <span class="texto-opcao">Como pessoa física (você e sua família)</span>
+          <span class="exemplo">Por exemplo: compra de carro ou imóvel, reforma da casa, dívidas e parcelas</span>
+        </label>
+
+        <label class="opcao">
+          <input type="checkbox" name="perfil" value="pj" id="perfil-pj" aria-controls="bloco-cnpj">
+          <span class="texto-opcao">Como dono, sócio ou administrador de empresa, inclusive MEI</span>
+          <span class="exemplo">Por exemplo: fechamento, recuperação judicial, renegociação de dívidas, investimentos e contratações</span>
+        </label>
+
+        <!-- P6: CNPJ, na tela da P1 (decidido em 13/11/2026) -->
+        <div class="bloco-cnpj" id="bloco-cnpj" hidden>
+          <label for="cnpj-1">CNPJ de cada empresa <span style="font-weight:400">(opcional)</span></label>
+          <p class="apoio">Serve só para não contarmos a mesma empresa duas vezes. Guardamos o número embaralhado, como o CPF, e ele nunca é publicado.</p>
+          <div id="lista-cnpj">
+            <div class="cnpj-item">
+              <div class="cnpj-linha">
+                <input type="text" id="cnpj-1" name="cnpj" class="cnpj" inputmode="numeric" autocomplete="off" maxlength="18" placeholder="00.000.000/0000-00">
+              </div>
+              <p class="erro" hidden></p>
+            </div>
+          </div>
+          <button type="button" class="botao-pequeno" id="adicionar-cnpj">+ adicionar outro CNPJ</button>
+        </div>
+
+        <p class="erro" hidden></p>
+      </fieldset>
+
+      <div class="acoes">
+        <button type="submit" class="botao">Continuar</button>
+      </div>
+    </form>
+  </section>
+
+  <!-- ============ EMPRESA (P2 a P5) ============ -->
+  <section class="etapa" data-etapa="empresa" data-papel="rosa" aria-labelledby="t-empresa" hidden>
+    <div class="progresso"></div>
+    <h2 class="titulo-etapa" id="t-empresa" tabindex="-1">Sua empresa</h2>
+    <p class="intro">Se você tem mais de uma empresa, responda por todas juntas.</p>
+
+    <form class="folha" data-form="empresa" novalidate>
+      <fieldset class="pergunta" data-tipo="multipla" data-q="p2">
+        <legend>Nos últimos 12 meses, os juros, o custo elevado do crédito ou as dívidas levaram uma ou mais de suas empresas a:
+          <span class="instrucao">Marque todas que se aplicam.</span>
+        </legend>
+        <label class="opcao"><input type="checkbox" name="p2" value="fechou"><span class="texto-opcao">Fechar as portas (inclui falência decretada)</span></label>
+        <label class="opcao"><input type="checkbox" name="p2" value="recuperacao"><span class="texto-opcao">Pedir recuperação judicial ou extrajudicial</span></label>
+        <label class="opcao"><input type="checkbox" name="p2" value="renegociou"><span class="texto-opcao">Renegociar dívidas para não fechar</span></label>
+        <label class="opcao"><input type="checkbox" name="p2" value="nenhuma" data-exclusiva><span class="texto-opcao">Nenhuma dessas</span></label>
+        <p class="erro" hidden></p>
+      </fieldset>
+
+      <!-- P3: só para quem marcou fechamento ou recuperação -->
+      <div class="pergunta dependente" data-tipo="numero" data-q="p3" hidden>
+        <label for="p3">Somando as empresas que fecharam ou pediram recuperação, quantas pessoas trabalhavam nelas antes disso, sem contar você?</label>
+        <input type="text" id="p3" name="p3" class="numero" inputmode="numeric" maxlength="6" autocomplete="off">
+        <p class="erro" hidden></p>
+      </div>
+
+      <fieldset class="pergunta" data-tipo="unica" data-q="p4">
+        <legend>Nos últimos 12 meses, você adiou ou desistiu de um ou mais investimentos em alguma das suas empresas, e os juros ou o preço do crédito pesaram muito nessa decisão?</legend>
+        <div class="opcoes-lado">
+          <label class="opcao"><input type="radio" name="p4" value="sim"><span class="texto-opcao">Sim</span></label>
+          <label class="opcao"><input type="radio" name="p4" value="nao"><span class="texto-opcao">Não</span></label>
+        </div>
+        <p class="erro" hidden></p>
+      </fieldset>
+
+      <!-- P5: só para quem marcou "Sim" na P4 -->
+      <div class="pergunta dependente" data-tipo="numero" data-q="p5" hidden>
+        <label for="p5">Com esses investimentos, quantas pessoas você contrataria?</label>
+        <input type="text" id="p5" name="p5" class="numero" inputmode="numeric" maxlength="6" autocomplete="off">
+        <p class="erro" hidden></p>
+      </div>
+
+      <div class="acoes">
+        <button type="submit" class="botao">Continuar</button>
+        <button type="button" class="botao-texto voltar" data-acao="voltar">Voltar</button>
+        <button type="button" class="botao-texto empurra" data-acao="pular">Pular esta etapa</button>
+      </div>
+    </form>
+  </section>
+
+  <!-- ============ CRÉDITO FORA DE BANCO (P7) ============ -->
+  <section class="etapa" data-etapa="credito" data-papel="laranja" aria-labelledby="t-credito" hidden>
+    <div class="progresso"></div>
+    <h2 class="titulo-etapa" id="t-credito" tabindex="-1">Crédito fora de banco</h2>
+
+    <form class="folha" data-form="credito" novalidate>
+      <fieldset class="pergunta" data-tipo="unica" data-q="p7">
+        <legend>Nos últimos 12 meses, você pegou dinheiro emprestado com juros fora de banco ou financeira (por exemplo, com agiota ou “empréstimo de rua”)?</legend>
+        <p class="apoio">Não perguntamos de quem, quanto nem onde.</p>
+        <div class="opcoes-lado">
+          <label class="opcao"><input type="radio" name="p7" value="sim"><span class="texto-opcao">Sim</span></label>
+          <label class="opcao"><input type="radio" name="p7" value="nao"><span class="texto-opcao">Não</span></label>
+        </div>
+        <p class="erro" hidden></p>
+      </fieldset>
+
+      <div class="acoes">
+        <button type="submit" class="botao">Continuar</button>
+        <button type="button" class="botao-texto voltar" data-acao="voltar">Voltar</button>
+        <button type="button" class="botao-texto empurra" data-acao="pular">Pular esta etapa</button>
+      </div>
+    </form>
+  </section>
+
+  <!-- ============ COMPRAS (P8) ============ -->
+  <section class="etapa" data-etapa="compras" data-papel="lima" aria-labelledby="t-compras" hidden>
+    <div class="progresso"></div>
+    <h2 class="titulo-etapa" id="t-compras" tabindex="-1">Compras</h2>
+
+    <form class="folha" data-form="compras" novalidate>
+      <fieldset class="pergunta" data-tipo="unica" data-q="p8">
+        <legend>Nos últimos 12 meses, você adiou ou desistiu de alguma compra de veículo ou imóvel, ou de uma reforma da casa, por causa dos juros ou do crédito caro?</legend>
+        <div class="opcoes-lado">
+          <label class="opcao"><input type="radio" name="p8" value="sim"><span class="texto-opcao">Sim</span></label>
+          <label class="opcao"><input type="radio" name="p8" value="nao"><span class="texto-opcao">Não</span></label>
+        </div>
+        <p class="erro" hidden></p>
+      </fieldset>
+
+      <div class="acoes">
+        <button type="submit" class="botao">Continuar</button>
+        <button type="button" class="botao-texto voltar" data-acao="voltar">Voltar</button>
+        <button type="button" class="botao-texto empurra" data-acao="pular">Pular esta etapa</button>
+      </div>
+    </form>
+  </section>
+
+  <!-- ============ DÍVIDAS (P9 a P13) ============ -->
+  <section class="etapa" data-etapa="dividas" data-papel="lilas" aria-labelledby="t-dividas" hidden>
+    <div class="progresso"></div>
+    <h2 class="titulo-etapa" id="t-dividas" tabindex="-1">Dívidas</h2>
+
+    <form class="folha" data-form="dividas" novalidate>
+      <fieldset class="pergunta" data-tipo="unica" data-q="p9">
+        <legend>Hoje, você tem contas ou dívidas em atraso?</legend>
+        <div class="opcoes-lado">
+          <label class="opcao"><input type="radio" name="p9" value="sim"><span class="texto-opcao">Sim</span></label>
+          <label class="opcao"><input type="radio" name="p9" value="nao"><span class="texto-opcao">Não</span></label>
+        </div>
+        <p class="erro" hidden></p>
+      </fieldset>
+
+      <!-- P10: só para quem marcou "Sim" na P9.
+           PENDENTE: conferir a redação exata da PEIC (lá a pergunta é negativa). -->
+      <fieldset class="pergunta dependente" data-tipo="unica" data-q="p10" hidden>
+        <legend>Você acredita que conseguirá pagar as contas ou dívidas em atraso?</legend>
+        <div class="opcoes-lado">
+          <label class="opcao"><input type="radio" name="p10" value="sim"><span class="texto-opcao">Sim</span></label>
+          <label class="opcao"><input type="radio" name="p10" value="nao"><span class="texto-opcao">Não</span></label>
+        </div>
+        <p class="erro" hidden></p>
+      </fieldset>
+
+      <fieldset class="pergunta" data-tipo="unica" data-q="p11">
+        <legend>Hoje, que parte da sua renda mensal vai para parcelas de dívidas, como financiamento de veículo ou imóvel, empréstimo consignado ou pessoal, ou pagamento de juros do cartão?</legend>
+        <label class="opcao"><input type="radio" name="p11" value="ate10"><span class="texto-opcao">Até 10%</span></label>
+        <label class="opcao"><input type="radio" name="p11" value="11a30"><span class="texto-opcao">De 11% a 30%</span></label>
+        <label class="opcao"><input type="radio" name="p11" value="31a50"><span class="texto-opcao">De 31% a 50%</span></label>
+        <label class="opcao"><input type="radio" name="p11" value="mais50"><span class="texto-opcao">Mais de 50%</span></label>
+        <label class="opcao"><input type="radio" name="p11" value="nenhuma"><span class="texto-opcao">Não pago parcelas de dívidas</span></label>
+        <p class="erro" hidden></p>
+      </fieldset>
+
+      <fieldset class="pergunta" data-tipo="multipla" data-q="p12">
+        <legend>Que tipos de dívida você tem hoje?
+          <span class="instrucao">Marque todas que se aplicam.</span>
+        </legend>
+        <label class="opcao"><input type="checkbox" name="p12" value="rotativo"><span class="texto-opcao">Rotativo do cartão de crédito</span></label>
+        <label class="opcao"><input type="checkbox" name="p12" value="parcelado_cartao"><span class="texto-opcao">Parcelado no cartão</span></label>
+        <label class="opcao"><input type="checkbox" name="p12" value="cheque_especial"><span class="texto-opcao">Cheque especial</span></label>
+        <label class="opcao"><input type="checkbox" name="p12" value="consignado"><span class="texto-opcao">Empréstimo consignado</span></label>
+        <label class="opcao"><input type="checkbox" name="p12" value="pessoal"><span class="texto-opcao">Empréstimo pessoal</span></label>
+        <label class="opcao"><input type="checkbox" name="p12" value="financiamento"><span class="texto-opcao">Financiamento (veículo, imóvel ou outro)</span></label>
+        <label class="opcao"><input type="checkbox" name="p12" value="nenhuma" data-exclusiva><span class="texto-opcao">Nenhuma dessas</span></label>
+        <p class="erro" hidden></p>
+      </fieldset>
+
+      <fieldset class="pergunta" data-tipo="unica" data-q="p13">
+        <legend>Nos últimos 12 meses, seu nome foi negativado (incluído em cadastro como Serasa ou SPC)?</legend>
+        <div class="opcoes-lado">
+          <label class="opcao"><input type="radio" name="p13" value="sim"><span class="texto-opcao">Sim</span></label>
+          <label class="opcao"><input type="radio" name="p13" value="nao"><span class="texto-opcao">Não</span></label>
+        </div>
+        <p class="erro" hidden></p>
+      </fieldset>
+
+      <div class="acoes">
+        <button type="submit" class="botao">Continuar</button>
+        <button type="button" class="botao-texto voltar" data-acao="voltar">Voltar</button>
+        <button type="button" class="botao-texto empurra" data-acao="pular">Pular esta etapa</button>
+      </div>
+    </form>
+  </section>
+
+  <!-- ============ ENCERRAMENTO ============ -->
+  <section class="etapa fim" data-etapa="fim" data-papel="amarelo" aria-labelledby="t-fim" hidden>
+    <h2 class="titulo-etapa" id="t-fim" tabindex="-1">Obrigado por contar sua história!</h2>
+
+    <div class="folha">
+      <!-- BACKEND: o servidor escolhe a versão conforme a assinatura da sessão
+           já ter sido confirmada ou não. No protótipo, use ?confirmado=1 na URL. -->
+      <div id="fim-pendente">
+        <p><strong>Falta só um passo: confirme sua assinatura pelo link que enviamos para o seu e-mail.</strong> Sem a confirmação, nem a assinatura nem estas respostas contam.</p>
+      </div>
+      <div id="fim-confirmado" hidden>
+        <p><strong>Suas respostas vão entrar, somadas às de outras pessoas, no próximo relatório.</strong></p>
+      </div>
+      <p>Você pode atualizar suas respostas quando quiser, em <a href="/meus-dados" data-em-breve="A página Meus Dados ainda está em construção.">Meus dados</a>.</p>
+    </div>
+
+    <!-- Decidido em 14/11/2026: por ora, só WhatsApp. -->
+    <div class="compartilhar">
+      <h2>Chame mais gente</h2>
+      <p>Quanto mais assinaturas, mais forte o relatório que chega ao Banco Central.</p>
+      <a class="botao botao-whatsapp" id="compartilhar-whatsapp" href="#" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1-.7-.3-1.4-.7-2-1.3-.6-.5-1-1.2-1.4-1.8-.1-.2 0-.4.1-.5l.4-.4.3-.5v-.5l-.8-1.9c-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.5.1-.7.3-.6.6-.9 1.3-.9 2.1.1.9.4 1.8 1 2.6a10.7 10.7 0 0 0 4.1 3.6c.6.3 1.1.4 1.7.6.6.1 1.2.1 1.8 0 .6-.1 1.1-.5 1.4-1 .2-.4.2-.8.2-1.2l-.5-.3z"/></svg>
+        Compartilhar no WhatsApp
+      </a>
+    </div>
+  </section>
+
+</main>
+
+<footer class="rodape">
+  <nav aria-label="Rodapé">
+    <ul>
+      <li><a href="/quem-somos" data-em-breve="A página Quem Somos ainda está em construção.">Quem somos</a></li>
+      <li><a href="/biblioteca" data-em-breve="A Biblioteca ainda está em construção.">Biblioteca</a></li>
+      <li><a href="privacidade.html">Política de privacidade</a></li>
+      <li><a href="/meus-dados" data-em-breve="A página Meus Dados ainda está em construção.">Meus dados e retirada de assinatura</a></li>
+      <li><a href="mailto:contato@exemplo.org">Contato</a></li>
+    </ul>
+  </nav>
+  <p>Boletim Popus. O relatório é entregue antes de cada reunião do Comitê de Política Monetária (COPOM) do Banco Central do Brasil.</p>
+</footer>
+
+<div class="aviso" role="status" aria-live="polite"></div>
+
+<script>
+(function () {
+  'use strict';
+
+  // PENDENTE: domínio definitivo do projeto.
+  var URL_ASSINAR = 'https://exemplo.org/assinar';
+  var TEXTO_WHATSAPP = 'Assinei o abaixo-assinado do Boletim Popus contra a política de juros do Banco Central. Assine você também: ' + URL_ASSINAR;
+
+  var MSG_RESPONDA = '* Responda esta pergunta para continuar, ou use “Pular esta etapa”.';
+  var MSG_MARQUE_UMA = '* Marque pelo menos uma opção.';
+  var MSG_NUMERO = '* Informe um número inteiro (0 ou mais).';
+  var MSG_CONSENTIMENTO = '* Para responder, marque a autorização. <a href="privacidade.html#dados">Entenda como usamos as respostas</a>';
+
+  var estado = {
+    etapaAtual: 'entrada',
+    perfil: [],          // 'pf', 'pj'
+    respostas: {},       // por etapa
+    pulados: {}          // etapas puladas não entram no denominador
+  };
+
+  /* ---------- Utilidades ---------- */
+  function $(sel, raiz) { return (raiz || document).querySelector(sel); }
+  function $$(sel, raiz) { return Array.prototype.slice.call((raiz || document).querySelectorAll(sel)); }
+  function secao(nome) { return $('[data-etapa="' + nome + '"]'); }
+  function soDigitos(v) { return (v || '').replace(/\D/g, ''); }
+
+  /* ---------- Sequência de etapas ----------
+     Abertura sempre; Empresa só para PJ; Crédito para todos;
+     Compras e Dívidas só para PF. A abertura conta como etapa 1. */
+  function sequencia() {
+    var s = ['abertura'];
+    if (estado.perfil.indexOf('pj') >= 0) s.push('empresa');
+    s.push('credito');
+    if (estado.perfil.indexOf('pf') >= 0) s.push('compras', 'dividas');
+    return s;
+  }
+
+  function atualizarProgresso(nome) {
+    var alvo = $('.progresso', secao(nome));
+    if (!alvo) return;
+    var seq = sequencia();
+    var i = seq.indexOf(nome);
+    var total = estado.perfil.length ? seq.length : null;   // antes da P1, o total ainda não é conhecido
+    var texto = total ? 'Etapa ' + (i + 1) + ' de ' + total : 'Etapa 1';
+    var barra = '';
+    if (total) {
+      barra = '<ol class="progresso-barra" aria-hidden="true">';
+      for (var k = 0; k < total; k++) barra += '<li' + (k <= i ? ' class="feito"' : '') + '></li>';
+      barra += '</ol>';
+    }
+    alvo.innerHTML = '<p class="progresso-texto">' + texto + '</p>' + barra;
+  }
+
+  function ir(nome) {
+    $$('.etapa').forEach(function (s) { s.hidden = true; });
+    var s = secao(nome);
+    s.hidden = false;
+    document.body.setAttribute('data-papel', s.getAttribute('data-papel'));
+    estado.etapaAtual = nome;
+    atualizarProgresso(nome);
+    window.scrollTo(0, 0);
+    var titulo = $('[tabindex="-1"]', s);
+    if (titulo) titulo.focus({ preventScroll: true });
+  }
+
+  function proxima() {
+    var seq = sequencia();
+    var i = seq.indexOf(estado.etapaAtual);
+    ir(i >= 0 && i < seq.length - 1 ? seq[i + 1] : 'fim');
+  }
+  function anterior() {
+    var seq = sequencia();
+    var i = seq.indexOf(estado.etapaAtual);
+    if (i > 0) ir(seq[i - 1]);
+  }
+
+  /* ---------- Salvar (a cada "Continuar" ou "Pular") ---------- */
+  function salvar(etapa, dados) {
+    // BACKEND: POST /conte-sua-historia/<etapa> com os dados do bloco
+    // (ou hx-post no formulário). Pular grava a etapa como pulada.
+    if (dados === null) {
+      estado.pulados[etapa] = true;
+      delete estado.respostas[etapa];
+    } else {
+      delete estado.pulados[etapa];
+      estado.respostas[etapa] = dados;
+    }
+    if (window.console) console.log('[protótipo] salvar', etapa, dados === null ? '(pulada)' : dados);
+  }
+
+  /* ---------- Erros ---------- */
+  function erroDe(pergunta) { return $(':scope > .erro', pergunta); }
+  function mostrarErro(pergunta, html) {
+    var e = erroDe(pergunta);
+    e.innerHTML = html;
+    e.hidden = false;
+    $$('input[type="text"]', pergunta).forEach(function (i) {
+      if (i.closest('.bloco-cnpj')) return;
+      i.setAttribute('aria-invalid', 'true');
+    });
+  }
+  function limparErro(pergunta) {
+    var e = erroDe(pergunta);
+    if (!e) return;
+    e.hidden = true;
+    e.innerHTML = '';
+    $$('[aria-invalid]', pergunta).forEach(function (i) {
+      if (i.closest('.bloco-cnpj')) return;
+      i.removeAttribute('aria-invalid');
+    });
+  }
+
+  /* ---------- Validação genérica das perguntas visíveis ---------- */
+  function validarEtapa(form) {
+    var ok = true;
+    var primeiro = null;
+    $$('.pergunta', form).forEach(function (p) {
+      if (p.hidden) return;
+      limparErro(p);
+      var tipo = p.getAttribute('data-tipo');
+      var falhou = false;
+      if (tipo === 'unica') {
+        falhou = !$('input:checked', p);
+        if (falhou) mostrarErro(p, MSG_RESPONDA);
+      } else if (tipo === 'multipla') {
+        falhou = !$('.opcao input:checked', p);
+        if (falhou) mostrarErro(p, p.getAttribute('data-q') === 'p1' ? MSG_MARQUE_UMA : MSG_RESPONDA);
+      } else if (tipo === 'numero') {
+        var v = $('input', p).value.trim();
+        falhou = !/^\d+$/.test(v);
+        if (falhou) mostrarErro(p, v ? MSG_NUMERO : MSG_RESPONDA);
+      }
+      if (falhou) { ok = false; if (!primeiro) primeiro = p; }
+    });
+    if (primeiro) {
+      var alvo = $('input', primeiro);
+      if (alvo) alvo.focus();
+    }
+    return ok;
+  }
+
+  function coletar(form) {
+    var dados = {};
+    $$('.pergunta', form).forEach(function (p) {
+      if (p.hidden) return;
+      var q = p.getAttribute('data-q');
+      var tipo = p.getAttribute('data-tipo');
+      if (tipo === 'unica') dados[q] = $('input:checked', p).value;
+      else if (tipo === 'multipla') dados[q] = $$('.opcao input:checked', p).map(function (i) { return i.value; });
+      else if (tipo === 'numero') dados[q] = parseInt($('input', p).value.trim(), 10);
+    });
+    return dados;
+  }
+
+  /* ---------- Perguntas dependentes ---------- */
+  function mostrarDependente(q, mostrar) {
+    var p = $('[data-q="' + q + '"]');
+    if (p.hidden === !mostrar) return;
+    p.hidden = !mostrar;
+    if (!mostrar) {
+      // Ao esconder, apaga a resposta, para não gravar algo que a pessoa não vê.
+      $$('input', p).forEach(function (i) {
+        if (i.type === 'text') i.value = '';
+        else i.checked = false;
+      });
+      limparErro(p);
+    }
+  }
+
+  // "Nenhuma dessas" exclui as outras opções, e vice-versa.
+  $$('input[data-exclusiva]').forEach(function (excl) {
+    var grupo = $$('input[name="' + excl.name + '"]');
+    grupo.forEach(function (i) {
+      i.addEventListener('change', function () {
+        if (!i.checked) return;
+        if (i === excl) grupo.forEach(function (o) { if (o !== excl) o.checked = false; });
+        else excl.checked = false;
+      });
+    });
+  });
+
+  // P2 → P3
+  $$('input[name="p2"]').forEach(function (i) {
+    i.addEventListener('change', function () {
+      var fechouOuRecuperacao = $$('input[name="p2"]:checked').some(function (c) {
+        return c.value === 'fechou' || c.value === 'recuperacao';
+      });
+      mostrarDependente('p3', fechouOuRecuperacao);
+    });
+  });
+  // P4 → P5
+  $$('input[name="p4"]').forEach(function (i) {
+    i.addEventListener('change', function () { mostrarDependente('p5', i.value === 'sim' && i.checked); });
+  });
+  // P9 → P10
+  $$('input[name="p9"]').forEach(function (i) {
+    i.addEventListener('change', function () { mostrarDependente('p10', i.value === 'sim' && i.checked); });
+  });
+
+  // Ao responder, o aviso de erro da pergunta some.
+  $$('.pergunta').forEach(function (p) {
+    p.addEventListener('change', function (e) {
+      if (e.target.closest('.bloco-cnpj')) return;
+      limparErro(p);
+    });
+    p.addEventListener('input', function (e) {
+      if (e.target.closest('.bloco-cnpj')) return;
+      if (e.target.classList.contains('numero')) {
+        e.target.value = soDigitos(e.target.value);
+        limparErro(p);
+      }
+    });
+  });
+
+  /* ---------- CNPJ (P6, dentro da P1) ---------- */
+  function formatarCNPJ(v) {
+    var d = soDigitos(v).slice(0, 14);
+    if (d.length > 12) return d.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{1,2})/, '$1.$2.$3/$4-$5');
+    if (d.length > 8) return d.replace(/(\d{2})(\d{3})(\d{3})(\d{1,4})/, '$1.$2.$3/$4');
+    if (d.length > 5) return d.replace(/(\d{2})(\d{3})(\d{1,3})/, '$1.$2.$3');
+    if (d.length > 2) return d.replace(/(\d{2})(\d{1,3})/, '$1.$2');
+    return d;
+  }
+  function cnpjValido(v) {
+    var d = soDigitos(v);
+    if (d.length !== 14 || /^(\d)\1{13}$/.test(d)) return false;
+    function dv(base) {
+      var pesos = base.length === 12 ? [5,4,3,2,9,8,7,6,5,4,3,2] : [6,5,4,3,2,9,8,7,6,5,4,3,2];
+      var soma = 0;
+      for (var i = 0; i < pesos.length; i++) soma += Number(base[i]) * pesos[i];
+      var r = soma % 11;
+      return r < 2 ? 0 : 11 - r;
+    }
+    var d1 = dv(d.slice(0, 12));
+    var d2 = dv(d.slice(0, 12) + d1);
+    return d1 === Number(d[12]) && d2 === Number(d[13]);
+  }
+
+  var listaCNPJ = $('#lista-cnpj');
+  var contadorCNPJ = 1;
+  listaCNPJ.addEventListener('input', function (e) {
+    if (!e.target.classList.contains('cnpj')) return;
+    e.target.value = formatarCNPJ(e.target.value);
+    var erro = $('.erro', e.target.closest('.cnpj-item'));
+    erro.hidden = true;
+    e.target.removeAttribute('aria-invalid');
+  });
+  listaCNPJ.addEventListener('click', function (e) {
+    var b = e.target.closest('[data-remover]');
+    if (!b) return;
+    b.closest('.cnpj-item').remove();
+    $('#adicionar-cnpj').focus();
+  });
+  $('#adicionar-cnpj').addEventListener('click', function () {
+    contadorCNPJ++;
+    var item = document.createElement('div');
+    item.className = 'cnpj-item';
+    item.innerHTML =
+      '<div class="cnpj-linha">' +
+        '<label class="sr" for="cnpj-' + contadorCNPJ + '">Outro CNPJ (opcional)</label>' +
+        '<input type="text" id="cnpj-' + contadorCNPJ + '" name="cnpj" class="cnpj" inputmode="numeric" autocomplete="off" maxlength="18" placeholder="00.000.000/0000-00">' +
+        '<button type="button" class="botao-pequeno" data-remover aria-label="Remover este CNPJ">Remover</button>' +
+      '</div>' +
+      '<p class="erro" hidden></p>';
+    listaCNPJ.appendChild(item);
+    $('input', item).focus();
+  });
+
+  $('#perfil-pj').addEventListener('change', function () {
+    $('#bloco-cnpj').hidden = !this.checked;
+  });
+
+  function validarCNPJs() {
+    var ok = true;
+    var primeiro = null;
+    $$('.cnpj', listaCNPJ).forEach(function (input) {
+      var erro = $('.erro', input.closest('.cnpj-item'));
+      erro.hidden = true;
+      input.removeAttribute('aria-invalid');
+      if (input.value.trim() && !cnpjValido(input.value)) {
+        erro.textContent = 'CNPJ inválido';
+        erro.hidden = false;
+        input.setAttribute('aria-invalid', 'true');
+        ok = false;
+        if (!primeiro) primeiro = input;
+      }
+    });
+    if (primeiro) primeiro.focus();
+    return ok;
+  }
+
+  /* ---------- Envio de cada etapa ---------- */
+  // Entrada: consentimento próprio do relato.
+  $('[data-form="entrada"]').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var caixa = $('#consentimento-relato');
+    var erro = $('#erro-consentimento-relato');
+    if (!caixa.checked) {
+      erro.innerHTML = MSG_CONSENTIMENTO;
+      erro.hidden = false;
+      caixa.setAttribute('aria-invalid', 'true');
+      caixa.focus();
+      return;
+    }
+    // BACKEND: gravar o consentimento do relato (data, hora, IP, versão do termo).
+    salvar('consentimento', { consentimento_relato: true });
+    ir('abertura');
+  });
+  $('#consentimento-relato').addEventListener('change', function () {
+    if (this.checked) { $('#erro-consentimento-relato').hidden = true; this.removeAttribute('aria-invalid'); }
+  });
+
+  // Abertura (P1 e CNPJ).
+  $('[data-form="abertura"]').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var form = this;
+    var ok = validarEtapa(form);
+    if ($('#perfil-pj').checked && !validarCNPJs()) ok = false;
+    if (!ok) return;
+
+    var perfil = $$('input[name="perfil"]:checked').map(function (i) { return i.value; });
+    var cnpjs = perfil.indexOf('pj') >= 0
+      ? $$('.cnpj', listaCNPJ).map(function (i) { return soDigitos(i.value); }).filter(Boolean)
+      : [];
+
+    // Se a pessoa voltou e mudou o perfil, descarta os blocos que deixaram de valer.
+    if (perfil.indexOf('pj') < 0) { delete estado.respostas.empresa; delete estado.pulados.empresa; }
+    if (perfil.indexOf('pf') < 0) {
+      ['compras', 'dividas'].forEach(function (b) { delete estado.respostas[b]; delete estado.pulados[b]; });
+    }
+    estado.perfil = perfil;
+    salvar('abertura', { p1: perfil, cnpj: cnpjs });
+    proxima();
+  });
+
+  // Demais etapas: validação genérica.
+  ['empresa', 'credito', 'compras', 'dividas'].forEach(function (nome) {
+    var form = $('[data-form="' + nome + '"]');
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      if (!validarEtapa(form)) return;
+      salvar(nome, coletar(form));
+      proxima();
+    });
+  });
+
+  // Voltar e Pular.
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest('[data-acao]');
+    if (!b) return;
+    var acao = b.getAttribute('data-acao');
+    if (acao === 'voltar') anterior();
+    if (acao === 'pular') {
+      var form = b.closest('form');
+      $$('.pergunta', form).forEach(limparErro);
+      salvar(estado.etapaAtual, null);
+      proxima();
+    }
+  });
+
+  /* ---------- Encerramento ---------- */
+  var confirmado = /[?&]confirmado=1\b/.test(window.location.search);
+  $('#fim-pendente').hidden = confirmado;
+  $('#fim-confirmado').hidden = !confirmado;
+  $('#compartilhar-whatsapp').href = 'https://wa.me/?text=' + encodeURIComponent(TEXTO_WHATSAPP);
+
+  /* ---------- Protótipo: links para páginas que ainda não existem ---------- */
+  var aviso = $('.aviso');
+  var timer;
+  document.addEventListener('click', function (e) {
+    var link = e.target.closest('a[data-em-breve]');
+    if (!link) return;
+    e.preventDefault();
+    aviso.textContent = link.getAttribute('data-em-breve');
+    aviso.classList.add('visivel');
+    clearTimeout(timer);
+    timer = setTimeout(function () { aviso.classList.remove('visivel'); }, 3200);
+  });
+})();
+</script>
+</body>
+</html>

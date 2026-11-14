@@ -10,7 +10,7 @@ O Boletim Popus é um abaixo-assinado permanente contra a política de juros do 
 
 É um contraponto ao [Boletim Focus](https://www.bcb.gov.br/publicacoes/focus): o Focus reúne as projeções dos economistas do mercado; o Popus reúne a voz de quem toma crédito.
 
-> **Status:** protótipo. A landing page e a minuta da política de privacidade estão prontas, sem backend. As métricas do relatório e as perguntas do relato estão definidas. O MVP vai coletar assinaturas e relatos desde o início. O primeiro relatório oficial está previsto para a reunião do COPOM de 16–17 de março de 2027.
+> **Status:** protótipo. A landing page, o formulário de assinatura, o questionário do relato e a minuta da política de privacidade estão prontos, ainda sem backend: os formulários simulam o envio e não gravam nada. O MVP vai coletar assinaturas e relatos desde o início. O primeiro relatório oficial está previsto para a reunião do COPOM de 16–17 de março de 2027.
 
 ## A ideia
 
@@ -30,8 +30,8 @@ A landing page é uma sequência de cartazes no estilo lambe-lambe, um por tema,
 
 | Passo | O que acontece |
 |---|---|
-| 1. Você assina | Com nome, e-mail e CPF; o estado (UF) é opcional. Leva menos de 1 minuto. O CPF garante uma assinatura por pessoa e nunca é publicado. |
-| 2. Você conta sua história (opcional) | Logo depois de assinar, você pode responder um questionário curto sobre como os juros afetaram sua vida, sua família ou sua empresa nos últimos 12 meses. |
+| 1. Você assina | Em `/assinar`, com nome, e-mail e CPF; o estado (UF) é opcional. Leva menos de 1 minuto. O CPF garante uma assinatura por pessoa e nunca é publicado. |
+| 2. Você conta sua história (opcional) | Logo depois de assinar, em `/conte-sua-historia`, você pode responder um questionário curto sobre como os juros afetaram sua vida, sua família ou sua empresa nos últimos 12 meses. São telas curtas, uma por tema, e só aparecem as que se aplicam a você. Dá para pular qualquer etapa. |
 | 3. Você confirma pelo e-mail | Sem o clique no link de confirmação, nem a assinatura nem o relato contam. |
 | 4. Sua assinatura vai no relatório | A assinatura vale para todos os ciclos até ser retirada. O nome só aparece se a pessoa autorizar; caso contrário, ela entra apenas na contagem. O relato entra só como número agregado. |
 
@@ -53,10 +53,10 @@ Os números são **relatos dos signatários**, de uma amostra autosselecionada, 
 
 Cada pergunta do relato existe para produzir um número publicado:
 
-- **Eventos**, em duas visões ("desde a primeira edição" e "desde a última reunião do COPOM"): empresas fechadas, em recuperação ou que renegociaram dívidas para não fechar, e os postos de trabalho nelas; investimentos adiados ou cancelados e os empregos que teriam sido criados; compras adiadas de veículo, imóvel ou reforma; crédito tomado fora de banco; nome negativado.
-- **Situação**, como retrato dos últimos 12 meses: contas em atraso, sem condições de pagar, parte da renda que vai para parcelas de dívidas (em faixas compatíveis com a PEIC/CNC) e tipos de dívida.
+- **Eventos**, em duas visões ("desde a primeira edição" e "desde a última reunião do COPOM"): empresas fechadas, em recuperação ou que renegociaram dívidas para não fechar, e os postos de trabalho nas que fecharam ou entraram em recuperação; investimentos adiados ou cancelados e os empregos que teriam sido criados; compras adiadas de veículo, imóvel ou reforma; crédito tomado fora de banco; nome negativado.
+- **Situação**, como retrato dos últimos 12 meses: contas em atraso, capacidade de pagá-las, parte da renda que vai para parcelas de dívidas (em faixas compatíveis com a PEIC/CNC) e tipos de dívida.
 
-O relato não pede valores em reais nem a renda. O questionário completo será publicado na metodologia.
+O relato não pede valores em reais nem a renda, e não tem texto livre. O questionário completo será publicado na metodologia.
 
 ### Ciclo
 
@@ -71,8 +71,9 @@ O relato não pede valores em reais nem a renda. O questionário completo será 
 
 Assinar um abaixo-assinado revela uma opinião política, que a LGPD trata como dado sensível. Por isso, a base inteira é tratada como sensível:
 
-- consentimentos em caixas separadas e não marcadas, com registro de data, versão do termo e IP; o relato tem consentimento próprio;
+- o consentimento da assinatura é um texto em destaque junto ao botão; publicar o nome e receber lembretes ficam em caixas separadas e não marcadas; o relato tem consentimento próprio. Todos são registrados com data, versão do termo e IP;
 - CPF guardado só como HMAC, com a chave fora do banco; nunca publicado nem enviado a terceiros. O CNPJ, opcional no relato, recebe o mesmo tratamento;
+- a tela depois do envio é igual para todos, para não revelar se um e-mail ou CPF já assinou. Se um CPF já cadastrado aparecer com outro e-mail, a assinatura nova fica suspensa e o e-mail antigo recebe um alerta;
 - só a UF é pedida, sem município, telefone, endereço ou renda;
 - assinaturas e relatos não confirmados por e-mail são apagados após 7 dias; retirar a assinatura apaga também o relato;
 - relatos publicados só como números agregados;
@@ -86,18 +87,20 @@ A minuta da política está em [`privacidade.html`](privacidade.html) (versão 0
 
 ```
 .
-├── index.html          # Landing page (protótipo: HTML, CSS e JS num arquivo só)
-├── privacidade.html    # Minuta da política de privacidade (v0.2)
+├── index.html                # Landing page
+├── assinar.html              # Formulário de assinatura e tela pós-envio
+├── conte-sua-historia.html   # Questionário do relato, em etapas
+├── privacidade.html          # Minuta da política de privacidade (v0.2)
 └── docs/
-    └── img/            # Imagens deste README
+    └── img/                  # Imagens deste README
 ```
 
-Para ver o protótipo, basta abrir `index.html` no navegador. Links para páginas que ainda não existem mostram um aviso de "em construção" (atributo `data-em-breve`).
+Cada página é um arquivo só, com HTML, CSS e JS. Para ver o protótipo, basta abrir `index.html` no navegador e seguir pelo botão de assinar. Os formulários validam os campos e simulam o envio; os pontos de integração com o backend estão marcados no código com `BACKEND:`. Para ver a tela final do relato de quem já confirmou o e-mail, abra `conte-sua-historia.html?confirmado=1`. Links para páginas que ainda não existem mostram um aviso de "em construção" (atributo `data-em-breve`).
 
 ## Stack planejada
 
 - **Backend:** Django + PostgreSQL, com o painel administrativo para revisar relatos fora do comum e acionar os ciclos.
-- **Frontend:** templates do Django com um pouco de HTMX, reaproveitando o HTML e o CSS da landing.
+- **Frontend:** templates do Django com um pouco de HTMX, reaproveitando o HTML e o CSS das páginas do protótipo.
 - **PDF:** WeasyPrint ou Typst, gráficos com matplotlib.
 - **E-mail:** Brevo, com rastreamento de aberturas e cliques desligado.
 - **Proteção:** Cloudflare e Turnstile.
@@ -108,7 +111,7 @@ Para ver o protótipo, basta abrir `index.html` no navegador. Links para página
 | Fase | Período | Entregas |
 |---|---|---|
 | 0. Protótipo e fundamentos | nov–dez 2026 | Landing page, especificação, métricas do relatório e questionário do relato, metodologia, política de privacidade, revisão jurídica |
-| 1. MVP de assinatura e relato | dez 2026–jan 2027 | Formulário de assinatura com confirmação por e-mail, formulário de relato, página Meus Dados, painel administrativo |
+| 1. MVP de assinatura e relato | dez 2026–jan 2027 | Formulário de assinatura com confirmação por e-mail e formulário de relato (front-end feito), página Meus Dados, painel administrativo |
 | 2. Relatório | jan–fev 2027 | Geração do PDF, ciclo de teste na reunião de 26–27 de janeiro, já com relatos reais |
 | 3. Conteúdo e divulgação | fev–mar 2027 | Biblioteca, Compartilhe, artigos "Entenda" |
 | Primeiro relatório | mar 2027 | Entrega antes da reunião de 16–17 de março |

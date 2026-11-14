@@ -1,0 +1,608 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Assinar o abaixo-assinado · Boletim Popus</title>
+<meta name="description" content="Assine o abaixo-assinado contra a política de juros do Banco Central. Leva menos de um minuto.">
+<style>
+/* ============================================================
+   Boletim Popus — página de assinatura (/assinar)
+   Protótipo de front-end: o envio é simulado em JavaScript.
+   Pontos de integração com o backend marcados com "BACKEND:".
+
+   Fontes hospedadas no próprio site (/fontes/), sem Google Fonts.
+   Enquanto os arquivos não existirem, valem as fontes reserva.
+   ============================================================ */
+@font-face { font-family: "Big Shoulders Display"; src: url("/fontes/big-shoulders-display-700.woff2") format("woff2"); font-weight: 700; font-display: swap; }
+@font-face { font-family: "Big Shoulders Display"; src: url("/fontes/big-shoulders-display-900.woff2") format("woff2"); font-weight: 900; font-display: swap; }
+@font-face { font-family: "Atkinson Hyperlegible"; src: url("/fontes/atkinson-hyperlegible-400.woff2") format("woff2"); font-weight: 400; font-display: swap; }
+@font-face { font-family: "Atkinson Hyperlegible"; src: url("/fontes/atkinson-hyperlegible-700.woff2") format("woff2"); font-weight: 700; font-display: swap; }
+
+:root {
+  --tinta: #000000;
+  --branco: #ffffff;
+  --papel-amarelo: #ffe600;
+  --papel-ciano:   #3fc8f2;
+  --papel-rosa:    #ff74a8;
+  --papel-lima:    #bfe34f;
+  --erro: #c4004a;
+
+  --fonte-cartaz: "Big Shoulders Display", "Arial Narrow", sans-serif;
+  --fonte-texto: "Atkinson Hyperlegible", system-ui, sans-serif;
+
+  --gutter: clamp(1rem, 5vw, 4rem);
+  --folha-max: 40rem;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+body {
+  margin: 0;
+  background: var(--papel-amarelo);
+  color: var(--tinta);
+  font-family: var(--fonte-texto);
+  font-size: 1.125rem;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: inherit; text-underline-offset: 3px; }
+:focus-visible { outline: 4px solid var(--tinta); outline-offset: 4px; }
+[hidden] { display: none !important; }
+
+/* ---------- Topo ---------- */
+.topo {
+  padding: clamp(1.25rem, 4vh, 2rem) var(--gutter) 0;
+}
+.marca-pequena {
+  display: inline-block;
+  font-family: var(--fonte-cartaz);
+  font-weight: 900;
+  font-size: 1.6rem;
+  line-height: 1;
+  text-transform: uppercase;
+  text-decoration: none;
+}
+.marca-pequena span {
+  background: var(--tinta);
+  color: var(--papel-amarelo);
+  padding: 0 0.12em;
+  margin-left: 0.15em;
+  display: inline-block;
+  transform: rotate(-2deg);
+}
+
+main {
+  padding: clamp(1.5rem, 5vh, 3rem) var(--gutter) 4rem;
+}
+
+h1 {
+  margin: 0 0 1rem;
+  font-family: var(--fonte-cartaz);
+  font-weight: 900;
+  font-size: clamp(2.6rem, 9vw, 5rem);
+  line-height: 0.92;
+  max-width: 14ch;
+}
+.chamada {
+  margin: 0 0 2rem;
+  max-width: var(--folha-max);
+  font-weight: 700;
+  font-size: clamp(1.1rem, 3vw, 1.3rem);
+}
+
+/* ---------- Folha (o formulário é uma folha branca colada no cartaz) ---------- */
+.folha {
+  max-width: var(--folha-max);
+  background: var(--branco);
+  border: 4px solid var(--tinta);
+  box-shadow: 10px 10px 0 var(--tinta);
+  padding: clamp(1.25rem, 4vw, 2.25rem);
+}
+
+/* ---------- Campos ---------- */
+.campo { margin: 0 0 1.5rem; }
+.campo label,
+.campo .rotulo {
+  display: block;
+  font-weight: 700;
+  margin-bottom: 0.4rem;
+}
+.campo .opcional { font-weight: 400; }
+.campo .ajuda {
+  display: block;
+  font-size: 0.95rem;
+  margin: -0.2rem 0 0.5rem;
+}
+
+input[type="text"],
+input[type="email"],
+select {
+  width: 100%;
+  font: inherit;
+  color: var(--tinta);
+  background: var(--branco);
+  border: 3px solid var(--tinta);
+  border-radius: 0;
+  padding: 0.7rem 0.8rem;
+  min-height: 3.2rem;
+}
+select {
+  appearance: none;
+  background-image: linear-gradient(45deg, transparent 50%, var(--tinta) 50%), linear-gradient(135deg, var(--tinta) 50%, transparent 50%);
+  background-position: calc(100% - 1.4rem) 55%, calc(100% - 0.9rem) 55%;
+  background-size: 0.5rem 0.5rem;
+  background-repeat: no-repeat;
+  padding-right: 2.5rem;
+}
+input:focus-visible, select:focus-visible {
+  outline: 4px solid var(--papel-ciano);
+  outline-offset: 0;
+}
+[aria-invalid="true"] { border-color: var(--erro); }
+
+.erro {
+  margin: 0.4rem 0 0;
+  color: var(--erro);
+  font-weight: 700;
+  font-size: 0.98rem;
+}
+.erro a { color: inherit; }
+
+/* Caixas de marcar */
+.caixas {
+  border: 0;
+  margin: 2rem 0 1.5rem;
+  padding: 1.25rem 0 0;
+  border-top: 3px solid var(--tinta);
+}
+.caixa {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0 0.8rem;
+  align-items: start;
+  margin: 0 0 1.25rem;
+}
+.caixa input[type="checkbox"] {
+  width: 1.6rem;
+  height: 1.6rem;
+  margin: 0.05rem 0 0;
+  accent-color: var(--tinta);
+}
+.caixa label { font-weight: 700; }
+.caixa .detalhe {
+  grid-column: 2;
+  font-size: 0.95rem;
+  margin: 0.2rem 0 0;
+}
+.caixa .erro { grid-column: 2; }
+
+/* Anti-robô */
+.turnstile {
+  margin: 0 0 1.5rem;
+  min-height: 65px;
+}
+/* Só no protótipo: marca o lugar do widget do Cloudflare Turnstile */
+.turnstile-marcador {
+  border: 2px dashed var(--tinta);
+  padding: 0.9rem 1rem;
+  font-size: 0.9rem;
+}
+
+/* Consentimento e botão */
+.consentimento {
+  background: var(--papel-ciano);
+  border: 3px solid var(--tinta);
+  padding: 1rem 1.1rem;
+  margin: 0 0 1.25rem;
+  font-size: 1rem;
+}
+.consentimento p { margin: 0; }
+
+.botao {
+  display: inline-block;
+  width: 100%;
+  background: var(--tinta);
+  color: var(--papel-amarelo);
+  font-family: var(--fonte-cartaz);
+  font-weight: 900;
+  font-size: clamp(1.4rem, 4.5vw, 1.9rem);
+  line-height: 1.1;
+  text-align: center;
+  text-decoration: none;
+  padding: 0.85rem 1.6rem 0.95rem;
+  border: 4px solid var(--tinta);
+  box-shadow: 6px 6px 0 var(--papel-amarelo), 6px 6px 0 3px var(--tinta);
+  cursor: pointer;
+  transition: transform 120ms ease, box-shadow 120ms ease;
+}
+.botao:hover { transform: translate(-2px, -2px); }
+.botao:active { transform: translate(4px, 4px); box-shadow: 2px 2px 0 var(--papel-amarelo); }
+.botao[disabled] { opacity: 0.6; cursor: wait; }
+@media (prefers-reduced-motion: reduce) { .botao { transition: none; } }
+
+.limite {
+  margin: 1.25rem 0 0;
+  font-size: 0.95rem;
+}
+
+/* ---------- Tela pós-envio ---------- */
+.pos-envio h1 { max-width: 16ch; }
+.confirmar {
+  max-width: var(--folha-max);
+  background: var(--branco);
+  border: 4px solid var(--tinta);
+  box-shadow: 10px 10px 0 var(--tinta);
+  padding: clamp(1.25rem, 4vw, 2.25rem);
+  margin-bottom: 3rem;
+}
+.confirmar .email-digitado {
+  display: inline-block;
+  background: var(--papel-amarelo);
+  padding: 0 0.3em;
+  font-weight: 700;
+  word-break: break-all;
+}
+.confirmar p { margin: 0 0 1rem; }
+.confirmar p:last-child { margin-bottom: 0; }
+.confirmar .pequeno { font-size: 0.95rem; }
+
+.convite {
+  max-width: var(--folha-max);
+  border-top: 6px solid var(--tinta);
+  padding-top: 1.25rem;
+}
+.convite h2 {
+  margin: 0 0 0.75rem;
+  font-family: var(--fonte-cartaz);
+  font-weight: 900;
+  font-size: clamp(1.9rem, 6vw, 2.8rem);
+  line-height: 1;
+}
+.convite p { margin: 0 0 1.5rem; }
+.convite .botao {
+  width: auto;
+  background: var(--tinta);
+}
+
+/* ---------- Rodapé ---------- */
+.rodape {
+  background: var(--tinta);
+  color: var(--branco);
+  padding: 2.5rem var(--gutter) 3rem;
+  font-size: 1rem;
+}
+.rodape nav ul {
+  list-style: none;
+  margin: 0 0 1.5rem;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 2rem;
+}
+.rodape p { margin: 0; max-width: 40rem; opacity: 0.85; }
+.rodape :focus-visible { outline-color: var(--papel-amarelo); }
+
+/* ---------- Aviso "em construção" (só no protótipo) ---------- */
+.aviso {
+  position: fixed;
+  left: 50%;
+  bottom: 1.25rem;
+  transform: translate(-50%, 150%);
+  background: var(--tinta);
+  color: var(--branco);
+  padding: 0.85rem 1.25rem;
+  font-weight: 700;
+  width: max-content;
+  max-width: calc(100vw - 2rem);
+  box-shadow: 5px 5px 0 var(--papel-amarelo);
+  visibility: hidden;
+  transition: transform 200ms ease, visibility 0s linear 200ms;
+  z-index: 10;
+}
+.aviso.visivel { transform: translate(-50%, 0); visibility: visible; transition: transform 200ms ease; }
+@media (prefers-reduced-motion: reduce) { .aviso { transition: none; } }
+</style>
+</head>
+<body>
+
+<header class="topo">
+  <a class="marca-pequena" href="/">Boletim<span>Popus</span></a>
+</header>
+
+<main>
+
+  <!-- ============ FORMULÁRIO ============ -->
+  <section id="tela-formulario" aria-labelledby="t-assinar">
+    <h1 id="t-assinar">Assine o abaixo-assinado</h1>
+    <p class="chamada">Leva menos de 1 minuto. Depois, se quiser, você pode contar como os juros afetaram sua vida.</p>
+
+    <!-- BACKEND: action e method reais; incluir o token CSRF do Django ({% csrf_token %}). -->
+    <form class="folha" id="form-assinatura" action="/assinar" method="post" novalidate>
+
+      <div class="campo">
+        <label for="nome">Nome completo</label>
+        <input type="text" id="nome" name="nome" autocomplete="name" required aria-describedby="erro-nome">
+        <p class="erro" id="erro-nome" hidden></p>
+      </div>
+
+      <div class="campo">
+        <label for="email">E-mail</label>
+        <span class="ajuda" id="ajuda-email">Vamos mandar um link para você confirmar a assinatura.</span>
+        <input type="email" id="email" name="email" autocomplete="email" inputmode="email" required aria-describedby="ajuda-email erro-email">
+        <p class="erro" id="erro-email" hidden></p>
+      </div>
+
+      <div class="campo">
+        <label for="cpf">CPF</label>
+        <span class="ajuda" id="ajuda-cpf">Garante uma assinatura por pessoa. Nunca é publicado.</span>
+        <input type="text" id="cpf" name="cpf" inputmode="numeric" autocomplete="off" maxlength="14" placeholder="000.000.000-00" required aria-describedby="ajuda-cpf erro-cpf">
+        <p class="erro" id="erro-cpf" hidden></p>
+      </div>
+
+      <div class="campo">
+        <label for="uf">Estado <span class="opcional">(opcional)</span></label>
+        <span class="ajuda" id="ajuda-uf">Usado só para contar quantas assinaturas há em cada estado.</span>
+        <!-- O valor gravado é o código IBGE da UF. -->
+        <select id="uf" name="uf" aria-describedby="ajuda-uf">
+          <option value="">Prefiro não informar</option>
+          <option value="12">Acre</option>
+          <option value="27">Alagoas</option>
+          <option value="16">Amapá</option>
+          <option value="13">Amazonas</option>
+          <option value="29">Bahia</option>
+          <option value="23">Ceará</option>
+          <option value="53">Distrito Federal</option>
+          <option value="32">Espírito Santo</option>
+          <option value="52">Goiás</option>
+          <option value="21">Maranhão</option>
+          <option value="51">Mato Grosso</option>
+          <option value="50">Mato Grosso do Sul</option>
+          <option value="31">Minas Gerais</option>
+          <option value="15">Pará</option>
+          <option value="25">Paraíba</option>
+          <option value="41">Paraná</option>
+          <option value="26">Pernambuco</option>
+          <option value="22">Piauí</option>
+          <option value="33">Rio de Janeiro</option>
+          <option value="24">Rio Grande do Norte</option>
+          <option value="43">Rio Grande do Sul</option>
+          <option value="11">Rondônia</option>
+          <option value="14">Roraima</option>
+          <option value="42">Santa Catarina</option>
+          <option value="35">São Paulo</option>
+          <option value="28">Sergipe</option>
+          <option value="17">Tocantins</option>
+        </select>
+      </div>
+
+      <!-- RASCUNHO: textos das caixas a revisar com o advogado. -->
+      <fieldset class="caixas">
+        <legend class="rotulo" style="position:absolute;left:-9999px">Declaração e escolhas</legend>
+
+        <div class="caixa">
+          <input type="checkbox" id="maior-idade" name="maior_idade" value="1" required aria-describedby="erro-maior-idade">
+          <label for="maior-idade">Declaro ter 18 anos ou mais.</label>
+          <p class="erro" id="erro-maior-idade" hidden></p>
+        </div>
+
+        <div class="caixa">
+          <input type="checkbox" id="publicar-nome" name="publicar_nome" value="1" aria-describedby="detalhe-publicar">
+          <label for="publicar-nome">Autorizo a publicação do meu nome no relatório e no site.</label>
+          <p class="detalhe" id="detalhe-publicar">Seu nome poderá aparecer em buscadores, como o Google, ligado a este abaixo-assinado. Sem esta autorização, sua assinatura entra só na contagem.</p>
+        </div>
+
+        <div class="caixa">
+          <input type="checkbox" id="lembretes" name="lembretes" value="1" aria-describedby="detalhe-lembretes">
+          <label for="lembretes">Quero receber lembretes antes de cada relatório e o aviso de quando ele for entregue.</label>
+          <p class="detalhe" id="detalhe-lembretes">Você pode deixar de receber quando quiser, sem retirar a assinatura.</p>
+        </div>
+      </fieldset>
+
+      <!-- BACKEND: widget do Cloudflare Turnstile.
+           <div class="cf-turnstile" data-sitekey="CHAVE_DO_SITE" data-language="pt-br"></div>
+           <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script> -->
+      <div class="turnstile">
+        <div class="turnstile-marcador">Aqui entra a verificação anti-robô (Cloudflare Turnstile).</div>
+      </div>
+
+      <!-- RASCUNHO: texto do consentimento (decidido em 13/11/2026: texto em destaque, sem caixa).
+           Pergunta ao advogado: basta como consentimento específico e destacado? -->
+      <div class="consentimento" id="texto-consentimento">
+        <p><strong>Ao assinar, autorizo o uso dos meus dados</strong> (nome, e-mail, CPF e, se informado, estado) para registrar minha assinatura e incluí-la nos relatórios entregues ao Banco Central e ao Ministério da Fazenda, conforme a <a href="privacidade.html">política de privacidade</a>. Meu CPF nunca é publicado.</p>
+      </div>
+
+      <button type="submit" class="botao" aria-describedby="texto-consentimento texto-limite">Assinar o abaixo-assinado</button>
+
+      <p class="limite" id="texto-limite">Você pode retirar sua assinatura, ou só o seu nome, até o fechamento de cada relatório. Depois do fechamento, o nome sai dos próximos relatórios, mas não do que já foi entregue.</p>
+    </form>
+  </section>
+
+  <!-- ============ TELA PÓS-ENVIO ============
+       Igual para todos, exista ou não cadastro com esse e-mail ou CPF
+       (decidido em 13/11/2026), para não revelar quem assinou. -->
+  <section id="tela-pos-envio" class="pos-envio" aria-labelledby="t-confirme" hidden>
+    <h1 id="t-confirme" tabindex="-1">Falta só um passo: confirme seu e-mail</h1>
+
+    <div class="confirmar">
+      <p>Enviamos um link de confirmação para <span class="email-digitado" id="email-digitado"></span>.</p>
+      <p><strong>Sem a confirmação, sua assinatura não conta.</strong></p>
+      <p class="pequeno">Não chegou em alguns minutos? Confira as pastas de spam e de promoções. O link vale por 7 dias.</p>
+    </div>
+
+    <div class="convite">
+      <h2>Tem mais 5 minutos?</h2>
+      <p>Conte como os juros afetaram sua vida, sua família ou sua empresa. É opcional, e suas respostas entram no relatório só como números, somadas às das outras pessoas.</p>
+      <!-- BACKEND: a sessão guarda o vínculo com a assinatura pendente; antes da
+           confirmação, ele só permite preencher o relato, não alterar os dados. -->
+      <a class="botao" href="conte-sua-historia.html">Contar minha história</a>
+    </div>
+  </section>
+
+</main>
+
+<footer class="rodape">
+  <nav aria-label="Rodapé">
+    <ul>
+      <li><a href="/quem-somos" data-em-breve="A página Quem Somos ainda está em construção.">Quem somos</a></li>
+      <li><a href="/biblioteca" data-em-breve="A Biblioteca ainda está em construção.">Biblioteca</a></li>
+      <li><a href="privacidade.html">Política de privacidade</a></li>
+      <li><a href="/meus-dados" data-em-breve="A página Meus Dados ainda está em construção.">Meus dados e retirada de assinatura</a></li>
+      <li><a href="mailto:contato@exemplo.org">Contato</a></li>
+    </ul>
+  </nav>
+  <p>Boletim Popus. O relatório é entregue antes de cada reunião do Comitê de Política Monetária (COPOM) do Banco Central do Brasil.</p>
+</footer>
+
+<div class="aviso" role="status" aria-live="polite"></div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ---------- Mensagens (decididas em 13/11/2026) ---------- */
+  // Cada campo obrigatório aponta para a seção da política que explica o dado.
+  var POLITICA = 'privacidade.html';
+  var SECAO = { nome: '#dados', email: '#dados', cpf: '#cpf', 'maior-idade': '#idade' };
+
+  function msgObrigatorio(id) {
+    return '* Campo obrigatório. <a href="' + POLITICA + SECAO[id] + '">Entenda por que precisamos desse dado</a>';
+  }
+
+  /* ---------- CPF ---------- */
+  function soDigitos(v) { return (v || '').replace(/\D/g, ''); }
+
+  function formatarCPF(v) {
+    var d = soDigitos(v).slice(0, 11);
+    if (d.length > 9) return d.replace(/(\d{3})(\d{3})(\d{3})(\d{1,2})/, '$1.$2.$3-$4');
+    if (d.length > 6) return d.replace(/(\d{3})(\d{3})(\d{1,3})/, '$1.$2.$3');
+    if (d.length > 3) return d.replace(/(\d{3})(\d{1,3})/, '$1.$2');
+    return d;
+  }
+
+  // Confere os dígitos verificadores. Não consulta a Receita Federal.
+  function cpfValido(v) {
+    var d = soDigitos(v);
+    if (d.length !== 11 || /^(\d)\1{10}$/.test(d)) return false;
+    for (var t = 9; t < 11; t++) {
+      var soma = 0;
+      for (var i = 0; i < t; i++) soma += Number(d[i]) * (t + 1 - i);
+      var dv = ((soma * 10) % 11) % 10;
+      if (dv !== Number(d[t])) return false;
+    }
+    return true;
+  }
+
+  function emailValido(v) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.trim());
+  }
+
+  /* ---------- Erros ---------- */
+  var form = document.getElementById('form-assinatura');
+
+  function mostrarErro(id, html) {
+    var campo = document.getElementById(id);
+    var erro = document.getElementById('erro-' + id);
+    erro.innerHTML = html;
+    erro.hidden = false;
+    campo.setAttribute('aria-invalid', 'true');
+  }
+  function limparErro(id) {
+    var campo = document.getElementById(id);
+    var erro = document.getElementById('erro-' + id);
+    erro.hidden = true;
+    erro.innerHTML = '';
+    campo.removeAttribute('aria-invalid');
+  }
+
+  function validar() {
+    var primeiroErro = null;
+    function falha(id, html) { mostrarErro(id, html); if (!primeiroErro) primeiroErro = id; }
+
+    var nome = document.getElementById('nome').value.trim();
+    var email = document.getElementById('email').value.trim();
+    var cpf = document.getElementById('cpf').value;
+    var idade = document.getElementById('maior-idade').checked;
+
+    ['nome', 'email', 'cpf', 'maior-idade'].forEach(limparErro);
+
+    if (!nome) falha('nome', msgObrigatorio('nome'));
+
+    if (!email) falha('email', msgObrigatorio('email'));
+    else if (!emailValido(email)) falha('email', 'E-mail inválido');
+
+    if (!soDigitos(cpf)) falha('cpf', msgObrigatorio('cpf'));
+    else if (!cpfValido(cpf)) falha('cpf', 'CPF inválido');
+
+    if (!idade) falha('maior-idade', msgObrigatorio('maior-idade'));
+
+    if (primeiroErro) document.getElementById(primeiroErro).focus();
+    return !primeiroErro;
+  }
+
+  /* ---------- Interações ---------- */
+  var cpfInput = document.getElementById('cpf');
+  // O CPF é conferido assim que o 11º dígito é digitado, e não ao sair do
+  // campo: um aviso que surge no blur empurra a página para baixo bem na
+  // hora do clique seguinte, e a pessoa erra a caixa que ia marcar.
+  cpfInput.addEventListener('input', function () {
+    cpfInput.value = formatarCPF(cpfInput.value);
+    if (soDigitos(cpfInput.value).length === 11 && !cpfValido(cpfInput.value)) {
+      mostrarErro('cpf', 'CPF inválido');
+    } else if (cpfInput.getAttribute('aria-invalid')) {
+      limparErro('cpf');
+    }
+  });
+
+  // Ao corrigir um campo com erro, o aviso some.
+  ['nome', 'email'].forEach(function (id) {
+    document.getElementById(id).addEventListener('input', function () {
+      if (this.getAttribute('aria-invalid')) limparErro(id);
+    });
+  });
+  document.getElementById('maior-idade').addEventListener('change', function () {
+    if (this.checked) limparErro('maior-idade');
+  });
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    if (!validar()) return;
+
+    var botao = form.querySelector('.botao');
+    botao.disabled = true;
+    botao.textContent = 'Enviando…';
+
+    // BACKEND: enviar o formulário (POST /assinar). O servidor:
+    //   1. valida de novo (CPF pelos dígitos verificadores, campos obrigatórios, Turnstile);
+    //   2. calcula o HMAC do CPF e aplica a regra de conflito;
+    //   3. grava o consentimento (data, hora, IP, versão do termo);
+    //   4. envia o e-mail de confirmação ao endereço digitado;
+    //   5. responde SEMPRE com a mesma tela, exista ou não cadastro.
+    // No protótipo, só simula a espera.
+    setTimeout(function () {
+      document.getElementById('email-digitado').textContent = document.getElementById('email').value.trim();
+      document.getElementById('tela-formulario').hidden = true;
+      document.getElementById('tela-pos-envio').hidden = false;
+      window.scrollTo(0, 0);
+      document.getElementById('t-confirme').focus();
+    }, 600);
+  });
+
+  /* ---------- Protótipo: links para páginas que ainda não existem ---------- */
+  var aviso = document.querySelector('.aviso');
+  var timer;
+  document.addEventListener('click', function (e) {
+    var link = e.target.closest('a[data-em-breve]');
+    if (!link) return;
+    e.preventDefault();
+    aviso.textContent = link.getAttribute('data-em-breve');
+    aviso.classList.add('visivel');
+    clearTimeout(timer);
+    timer = setTimeout(function () { aviso.classList.remove('visivel'); }, 3200);
+  });
+})();
+</script>
+</body>
+</html>
